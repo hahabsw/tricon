@@ -55,3 +55,9 @@ tfplan*
 
 # local infra (not committed)
 /infra/
+
+# local deploy (not committed)
+/deploy/
+
+# local scripts (not committed)
+/scripts/
