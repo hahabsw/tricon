@@ -26,7 +26,7 @@ export default function Home() {
   };
 
   return (
-    <div className="relative h-screen w-full overflow-y-auto overflow-x-hidden bg-space-900">
+    <div className="relative min-h-dvh w-full overflow-x-hidden bg-space-900">
       {/* Background decoration */}
       <div className="absolute inset-0 z-0 opacity-20">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500/30 rounded-full blur-[120px]" />

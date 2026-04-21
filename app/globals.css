@@ -11,13 +11,27 @@
   --foreground: #ffffff;
 }
 
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
 body {
   background-color: var(--background);
   color: var(--foreground);
-  margin: 0;
-  padding: 0;
   font-family: system-ui, -apple-system, sans-serif;
+  overscroll-behavior-y: none;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Applied on the game page to lock the viewport during play. */
+body.game-lock {
   overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
+  position: fixed;
+  inset: 0;
+  width: 100%;
 }
 
 .glass {

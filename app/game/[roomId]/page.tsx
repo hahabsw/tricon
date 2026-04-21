@@ -47,12 +47,19 @@ export default function GamePage() {
     };
   }, [roomId]);
 
+  useEffect(() => {
+    document.body.classList.add("game-lock");
+    return () => {
+      document.body.classList.remove("game-lock");
+    };
+  }, []);
+
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-[#050510] text-white space-y-8">
-        <h1 className="text-4xl font-black text-rose-500 tracking-tighter drop-shadow-lg">CONNECTION FAILED</h1>
+      <div className="flex flex-col items-center justify-center min-h-dvh bg-[#050510] text-white space-y-8 px-4 text-center">
+        <h1 className="text-3xl sm:text-4xl font-black text-rose-500 tracking-tighter drop-shadow-lg">CONNECTION FAILED</h1>
         <p className="text-white/50 uppercase tracking-widest text-sm">{error}</p>
-        <button 
+        <button
           onClick={() => router.push("/")}
           className="px-8 py-4 bg-white/10 hover:bg-white/20 transition-all rounded-lg font-bold border border-white/20 uppercase tracking-widest text-sm"
         >
@@ -63,7 +70,7 @@ export default function GamePage() {
   }
 
   return (
-    <div className="relative w-screen h-screen bg-[#050510] overflow-hidden select-none">
+    <div className="relative w-full h-dvh bg-[#050510] overflow-hidden select-none">
       {/* Global space overlay */}
       <div className="absolute inset-0 pointer-events-none opacity-20 mix-blend-screen bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]" />
 
@@ -72,11 +79,11 @@ export default function GamePage() {
       {(phase === "playing" || phase === "paused" || phase === "finished") && (
         <>
           <Scoreboard />
-          
-          <div className="absolute inset-0 p-8 pt-32 pb-48">
+
+          <div className="absolute inset-0 p-2 pt-20 pb-36 sm:p-8 sm:pt-32 sm:pb-48">
             <GameBoard />
           </div>
-          
+
           {phase === "playing" && <TurnIndicator />}
         </>
       )}
