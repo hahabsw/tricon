@@ -52,3 +52,6 @@ tfplan*
 
 # local docs (not committed)
 /docs/
+
+# local infra (not committed)
+/infra/
