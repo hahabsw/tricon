@@ -68,7 +68,7 @@ export default function GamePage() {
 
       {phase === "waiting" && <WaitingRoom />}
 
-      {(phase === "playing" || phase === "finished") && (
+      {(phase === "playing" || phase === "paused" || phase === "finished") && (
         <>
           <Scoreboard />
           
@@ -78,6 +78,25 @@ export default function GamePage() {
           
           {phase === "playing" && <TurnIndicator />}
         </>
+      )}
+
+      {phase === "paused" && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center p-6">
+          <div className="glass w-full max-w-lg rounded-2xl border border-white/10 p-6 sm:p-8 shadow-2xl text-center">
+            <div className="text-xl sm:text-2xl font-black tracking-tight">
+              플레이할 상대가 없습니다
+            </div>
+            <div className="mt-2 text-sm sm:text-base text-white/70 leading-relaxed">
+              상대가 다시 접속하면 게임이 자동으로 재개됩니다.
+            </div>
+            <button
+              onClick={() => router.push("/")}
+              className="mt-6 w-full sm:w-auto px-6 py-3 bg-white/10 hover:bg-white/20 transition-all rounded-lg font-bold border border-white/20 uppercase tracking-widest text-xs sm:text-sm"
+            >
+              Return to Menu
+            </button>
+          </div>
+        </div>
       )}
 
       {phase === "finished" && <ResultScreen />}

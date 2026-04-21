@@ -74,7 +74,7 @@ export interface GameSettings {
   fieldHeight: number;
 }
 
-export type GamePhase = "waiting" | "playing" | "finished";
+export type GamePhase = "waiting" | "playing" | "paused" | "finished";
 export type AIDifficulty = "easy" | "normal" | "hard";
 
 /** Player action: place an edge */

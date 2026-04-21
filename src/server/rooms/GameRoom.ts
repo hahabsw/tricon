@@ -93,6 +93,8 @@ export class GameRoom extends Room<{ state: GameStateSchema }> {
     this.state.players.set(player.id, player);
     this.state.turnOrder.push(player.id);
 
+    this.ensurePlayableOrPause();
+
     if (this.clients.length >= this.maxClients) {
       await this.lock();
     }
@@ -103,6 +105,7 @@ export class GameRoom extends Room<{ state: GameStateSchema }> {
     if (player) {
       player.connected = false;
     }
+    this.ensurePlayableOrPause();
   }
 
   async onLeave(client: Client, code?: number) {
@@ -124,6 +127,7 @@ export class GameRoom extends Room<{ state: GameStateSchema }> {
     }
 
     player.connected = false;
+    this.ensurePlayableOrPause();
 
     if (consented) {
       if (this.state.phase === "playing" && this.state.currentTurnPlayerId === client.sessionId) {
@@ -136,6 +140,7 @@ export class GameRoom extends Room<{ state: GameStateSchema }> {
     try {
       await this.allowReconnection(client, 60);
       player.connected = true;
+      this.ensurePlayableOrPause();
     } catch {
       if (this.state.phase === "playing" && this.state.currentTurnPlayerId === client.sessionId) {
         this.advanceAfterPass();
@@ -279,6 +284,7 @@ export class GameRoom extends Room<{ state: GameStateSchema }> {
     this.syncFromPlainState(plainState);
     await this.lock();
     this.broadcast("game_started", { currentTurnPlayerId: this.state.currentTurnPlayerId });
+    this.ensurePlayableOrPause();
     this.startTurnCycle();
   }
 
@@ -325,6 +331,7 @@ export class GameRoom extends Room<{ state: GameStateSchema }> {
   private startTurnCycle() {
     this.clearTurnTimers();
 
+    this.ensurePlayableOrPause();
     if (this.state.phase !== "playing") {
       return;
     }
@@ -421,6 +428,32 @@ export class GameRoom extends Room<{ state: GameStateSchema }> {
     this.turnTimeout = undefined;
     this.turnCountdown = undefined;
     this.aiTimeout = undefined;
+  }
+
+  private ensurePlayableOrPause() {
+    if (this.state.phase !== "playing" && this.state.phase !== "paused") {
+      return;
+    }
+
+    const connectedPlayers = Array.from(this.state.players.values()).filter((p) => p.connected);
+    const canPlay = connectedPlayers.length >= 2;
+
+    if (!canPlay) {
+      if (this.state.phase !== "paused") {
+        this.clearTurnTimers();
+        this.state.phase = "paused";
+        this.state.turnTimeLeft = 0;
+        this.broadcast("game_paused", { reason: "no_opponent" });
+      }
+      return;
+    }
+
+    if (this.state.phase === "paused") {
+      this.state.phase = "playing";
+      this.state.turnTimeLeft = this.state.settings.turnTimeSeconds;
+      this.broadcast("game_resumed", {});
+      this.startTurnCycle();
+    }
   }
 
   private canStartGame() {
