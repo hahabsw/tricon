@@ -3,7 +3,7 @@
 Tricon is a turn-based multiplayer strategy game where players connect stars (nodes) to claim **triangle territories** and compete by total area.  
 This repo contains both the web client (Next.js) and the realtime game server (Colyseus).
 
-- **Live demo**: `https://tricon.baesw.com`
+- **Live demo**: [tricon.baesw.com](https://tricon.baesw.com)
 
 ## Features
 
