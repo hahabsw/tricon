@@ -1,186 +1,70 @@
 "use client";
 
-import { Canvas, useFrame } from "@react-three/fiber";
-import { useRef, useState } from "react";
-import { Points, PointMaterial, OrbitControls } from '@react-three/drei'
-import * as THREE from "three";
-import { rotate } from "maath/dist/declarations/src/buffer";
-
-// 은하수 형태의 별 분포 생성 함수
-function generateGalaxyPositions(count: number, radius: number, arms: number = 4) {
-  const positions = new Float32Array(count * 3);
-  
-  for (let i = 0; i < count; i++) {
-    // 나선 팔 선택
-    const armIndex = Math.floor(Math.random() * arms);
-    const armAngle = (armIndex / arms) * Math.PI * 2;
-    
-    // 나선 곡선을 따라 위치 결정 (로그 나선)
-    const t = Math.random();
-    const spiralRadius = radius * Math.sqrt(t); // 중심에서 멀어질수록 밀도 감소 (더 자연스러운 분포)
-    const spiralAngle = spiralRadius * 0.8 + armAngle; // 나선 각도 (더 타이트한 나선)
-    
-    // 나선 곡선의 기본 위치
-    const baseX = Math.cos(spiralAngle) * spiralRadius;
-    const baseY = Math.sin(spiralAngle) * spiralRadius;
-    
-    // 나선 주변에 노이즈 추가 (은하수처럼 부드러운 곡선)
-    // 나선 방향에 수직인 방향으로 노이즈 추가
-    const perpendicularAngle = spiralAngle + Math.PI / 2;
-    const noiseAmount = (Math.random() - 0.5) * radius * 0.4 * (1 - t * 0.7); // 중심에서 멀수록 노이즈 감소
-    const noiseX = Math.cos(perpendicularAngle) * noiseAmount;
-    const noiseY = Math.sin(perpendicularAngle) * noiseAmount;
-    
-    // 나선 방향으로도 약간의 노이즈 추가 (더 자연스러운 곡선)
-    const alongSpiralNoise = (Math.random() - 0.5) * radius * 0.2 * (1 - t);
-    const alongX = Math.cos(spiralAngle) * alongSpiralNoise;
-    const alongY = Math.sin(spiralAngle) * alongSpiralNoise;
-    
-    // 최종 위치
-    const x = baseX + noiseX + alongX;
-    const y = baseY + noiseY + alongY;
-    const z = (Math.random() - 0.5) * radius * 0.1; // 약간의 깊이
-    
-    positions[i * 3] = x;
-    positions[i * 3 + 1] = y;
-    positions[i * 3 + 2] = z;
-  }
-  
-  return positions;
-}
-
-// 패럴랙스 별 레이어 컴포넌트
-function ParallaxStarLayer({ 
-  count, 
-  radius, 
-  center,
-  speed, 
-  color, 
-  size,
-  mousePosition,
-  arms = 4, 
-  rotateSpeed = 0.001  
-}: { 
-  count: number; 
-  radius: number; 
-  center: { x: number; y: number };
-  speed: number; 
-  color: string;
-  size: number;
-  mousePosition: { x: number; y: number };
-  arms?: number;
-  rotateSpeed?: number;
-}) {
-  const ref = useRef<THREE.Points>(null);
-  const [positions] = useState(() => generateGalaxyPositions(count, radius, arms));
-
-  useFrame(() => {
-    if (ref.current) {
-      // 마우스 위치에 따라 패럴랙스 효과 적용
-      ref.current.position.x = (mousePosition.x - center.x) * speed;
-      ref.current.position.y = (mousePosition.y - center.y) * speed;
-      ref.current.rotation.set(0, 0, Math.sin(Date.now() * rotateSpeed) * 0.01, 'ZXY');
-    }
-  });
-
-  return (
-    <Points ref={ref} positions={positions} stride={3} frustumCulled={false}
-    >
-      <PointMaterial 
-        transparent 
-        color={color} 
-        size={size} 
-        sizeAttenuation={true} 
-        depthWrite={false} 
-      />
-    </Points>
-  );
-}
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { joinRoomById } from "../src/client/network/client";
 
 export default function Home() {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const router = useRouter();
+  const [joinCode, setJoinCode] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top) / rect.height - 0.5;
-    setMousePosition({ x: x * 2, y: y * 2 });
+  const handleCreate = () => {
+    router.push("/lobby");
+  };
+
+  const handleJoin = async () => {
+    if (!joinCode) return;
+    setLoading(true);
+    try {
+      const room = await joinRoomById(joinCode);
+      router.push(`/game/${room.roomId}`);
+    } catch (e) {
+      alert("Failed to join room.");
+      setLoading(false);
+    }
   };
 
   return (
-    <div 
-      id="canvas-container"
-      onMouseMove={handleMouseMove}
-      style={{ width: '100%', height: '100vh', cursor: 'grab' }}
-    >
-      <Canvas camera={{ position: [0, 0, 50], fov: 75 }}>
-        {/* 2D top view로 고정된 카메라 설정 */}
-        <OrbitControls 
-          enablePan={true}
-          enableZoom={true}
-          enableRotate={false}
-          minDistance={20}
-          maxDistance={200}
-          // 완전히 위에서 내려다보는 각도로 고정
-          minPolarAngle={Math.PI / 2}
-          maxPolarAngle={Math.PI / 2}
-          // 수평 회전도 고정
-          minAzimuthAngle={0}
-          maxAzimuthAngle={0}
-        />
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[#050510] relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute inset-0 z-0 opacity-20">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500/30 rounded-full blur-[120px]" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-fuchsia-500/30 rounded-full blur-[120px]" />
+      </div>
+
+      <div className="z-10 flex flex-col items-center space-y-8 glass p-12 rounded-2xl border border-white/10 shadow-2xl">
+        <h1 className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-fuchsia-400 tracking-tighter drop-shadow-sm">
+          Stellar Conquest
+        </h1>
         
-        {/* 배경 별 레이어들 - 은하수 형태로 군집된 패럴랙스 효과 */}
-        <ParallaxStarLayer 
-          count={2000} 
-          radius={80} 
-          center={{ x: 0, y: 0 }}
-          speed={0.1} 
-          color="#ffffff" 
-          size={0.5}
-          mousePosition={mousePosition}
-          arms={6}
-        />
-        <ParallaxStarLayer 
-          count={1500} 
-          radius={60} 
-          center={{ x: 20, y: 20 }}
-          speed={0.2} 
-          color="#aaccff" 
-          size={0.4}
-          mousePosition={mousePosition}
-          arms={4}
-        />
-        <ParallaxStarLayer 
-          count={1000} 
-          radius={40} 
-          center={{ x: -20, y: -20 }}
-          speed={0.3} 
-          color="#ffaacc" 
-          size={0.3}
-          mousePosition={mousePosition}
-          arms={3}
-        />
-        <ParallaxStarLayer 
-          count={800} 
-          radius={25} 
-          center={{ x: 20, y: -20 }}
-          speed={0.4} 
-          color="#ffffaa" 
-          size={0.25}
-          mousePosition={mousePosition}
-          arms={3}
-        />
-        <ParallaxStarLayer 
-          count={800} 
-          radius={150} 
-          center={{ x: -20, y: 20 }}
-          speed={0.5} 
-          color="#008888" 
-          size={0.2}
-          mousePosition={mousePosition}
-          arms={2}
-        />
-      </Canvas>
+        <div className="w-full flex flex-col space-y-4">
+          <button 
+            onClick={handleCreate}
+            disabled={loading}
+            className="w-full py-4 bg-white/10 hover:bg-white/20 transition-all rounded-lg font-bold text-lg border border-white/20 hover:border-white/40 shadow-[0_0_15px_rgba(255,255,255,0.1)]"
+          >
+            Create New Room
+          </button>
+          
+          <div className="flex items-center space-x-2">
+            <input 
+              type="text" 
+              placeholder="Room Code" 
+              value={joinCode}
+              onChange={(e) => setJoinCode(e.target.value)}
+              className="flex-1 bg-black/40 border border-white/10 rounded-lg px-4 py-4 outline-none focus:border-cyan-400 transition-colors uppercase text-center tracking-widest font-mono"
+            />
+            <button 
+              onClick={handleJoin}
+              disabled={loading || !joinCode}
+              className="py-4 px-8 bg-cyan-500/20 hover:bg-cyan-500/40 text-cyan-200 transition-all rounded-lg font-bold border border-cyan-500/50"
+            >
+              Join
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

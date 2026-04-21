@@ -1,0 +1,86 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { useGameStore } from "../../../src/client/store/gameStore";
+import { joinRoomById, getCurrentRoom, cancelPendingLeave, leaveRoomDeferred, reconnectRoom } from "../../../src/client/network/client";
+import { WaitingRoom } from "../../../components/WaitingRoom";
+import { Scoreboard } from "../../../components/Scoreboard";
+import { TurnIndicator } from "../../../components/TurnIndicator";
+import { ResultScreen } from "../../../components/ResultScreen";
+import { GameBoard } from "../../../src/client/renderer/GameBoard";
+
+export default function GamePage() {
+  const params = useParams();
+  const router = useRouter();
+  const roomId = params.roomId as string;
+  const { phase } = useGameStore();
+  const [error, setError] = useState<string | null>(null);
+  const initRef = useRef(false);
+
+  useEffect(() => {
+    let mounted = true;
+    cancelPendingLeave();
+
+    const init = async () => {
+      if (getCurrentRoom()) return;
+      if (initRef.current) return;
+      initRef.current = true;
+      try {
+        await reconnectRoom(roomId);
+      } catch {
+        try {
+          await joinRoomById(roomId);
+        } catch {
+          if (mounted) setError("Room not found or disconnected.");
+        }
+      }
+    };
+
+    init();
+
+    return () => {
+      mounted = false;
+      initRef.current = false;
+      leaveRoomDeferred();
+    };
+  }, [roomId]);
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-[#050510] text-white space-y-8">
+        <h1 className="text-4xl font-black text-rose-500 tracking-tighter drop-shadow-lg">CONNECTION FAILED</h1>
+        <p className="text-white/50 uppercase tracking-widest text-sm">{error}</p>
+        <button 
+          onClick={() => router.push("/")}
+          className="px-8 py-4 bg-white/10 hover:bg-white/20 transition-all rounded-lg font-bold border border-white/20 uppercase tracking-widest text-sm"
+        >
+          Return to Menu
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative w-screen h-screen bg-[#050510] overflow-hidden select-none">
+      {/* Global space overlay */}
+      <div className="absolute inset-0 pointer-events-none opacity-20 mix-blend-screen bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]" />
+
+      {phase === "waiting" && <WaitingRoom />}
+
+      {(phase === "playing" || phase === "finished") && (
+        <>
+          <Scoreboard />
+          
+          <div className="absolute inset-0 p-8 pt-32 pb-48">
+            <GameBoard />
+          </div>
+          
+          {phase === "playing" && <TurnIndicator />}
+        </>
+      )}
+
+      {phase === "finished" && <ResultScreen />}
+    </div>
+  );
+}
