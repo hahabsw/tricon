@@ -49,3 +49,6 @@ next-env.d.ts
 *.tfvars
 !*.tfvars.example
 tfplan*
+
+# local docs (not committed)
+/docs/
