@@ -1,5 +1,5 @@
 // ============================================================
-// Stellar Conquest - Shared Game Types
+// Tricon - Shared Game Types
 // Used by both client and server
 // ============================================================
 

@@ -26,7 +26,7 @@ export default function Home() {
   };
 
   return (
-    <div className="relative h-screen w-full overflow-y-auto overflow-x-hidden bg-[#050510]">
+    <div className="relative h-screen w-full overflow-y-auto overflow-x-hidden bg-space-900">
       {/* Background decoration */}
       <div className="absolute inset-0 z-0 opacity-20">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500/30 rounded-full blur-[120px]" />
@@ -35,8 +35,8 @@ export default function Home() {
 
       <div className="relative z-10 mx-auto flex w-full max-w-2xl flex-col items-center px-4 py-10">
         <div className="flex w-full flex-col items-center space-y-6 glass p-6 sm:p-8 md:p-12 rounded-2xl border border-white/10 shadow-2xl">
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-fuchsia-400 tracking-tighter drop-shadow-sm text-center">
-          Stellar Conquest
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-linear-to-r from-cyan-400 to-fuchsia-400 tracking-tighter drop-shadow-sm text-center">
+          Tricon
         </h1>
         
         <div className="w-full flex flex-col space-y-4">

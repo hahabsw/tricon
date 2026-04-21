@@ -1,4 +1,4 @@
-import { Client, Room } from '@colyseus/sdk';
+import { Client, JoinOptions, Room } from '@colyseus/sdk';
 import { GameStateSchema } from '../../server/schema/GameState';
 import { useGameStore } from '../store/gameStore';
 
@@ -15,7 +15,7 @@ export const colyseusClient = new Client(getEndpoint());
 
 let currentRoom: Room<GameStateSchema> | null = null;
 
-export const joinOrCreateRoom = async (roomName: string, options: any) => {
+export const joinOrCreateRoom = async (roomName: string, options: JoinOptions) => {
   try {
     const room = await colyseusClient.joinOrCreate<GameStateSchema>(roomName, options);
     setupRoom(room);
@@ -26,7 +26,7 @@ export const joinOrCreateRoom = async (roomName: string, options: any) => {
   }
 };
 
-const RECONNECT_TOKEN_KEY = 'stellar_reconnect_token';
+const RECONNECT_TOKEN_KEY = 'tricon_reconnect_token';
 
 const saveReconnectToken = (room: Room<GameStateSchema>) => {
   try {
@@ -58,7 +58,7 @@ export const reconnectRoom = async (roomId: string) => {
   return room;
 };
 
-export const joinRoomById = async (roomId: string, options?: any) => {
+export const joinRoomById = async (roomId: string, options?: JoinOptions) => {
   try {
     const room = await colyseusClient.joinById<GameStateSchema>(roomId, options);
     setupRoom(room);

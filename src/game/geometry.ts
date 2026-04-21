@@ -1,5 +1,5 @@
 // ============================================================
-// Stellar Conquest - Geometry Utilities
+// Tricon - Geometry Utilities
 // Line intersection, triangle detection, area calculation
 // ============================================================
 

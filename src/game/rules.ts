@@ -1,5 +1,5 @@
 // ============================================================
-// Stellar Conquest - Game Rules Validation
+// Tricon - Game Rules Validation
 // Validates moves, checks game end conditions
 // ============================================================
 

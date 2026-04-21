@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Tricon
 
-## Getting Started
+Tricon is a turn-based multiplayer strategy game where players connect stars (nodes) to claim **triangle territories** and compete by total area.  
+This repo contains both the web client (Next.js) and the realtime game server (Colyseus).
 
-First, run the development server:
+- **Live demo**: `https://tricon.baesw.com`
+
+## Features
+
+- **Multiplayer rooms**: create/join rooms via room code
+- **Authoritative server**: Colyseus Room-based state sync
+- **Server-side validation**: no-intersection, no-duplicate edges, distance/connection limits
+- **Scoring & results**: triangle-area scoring and final rankings
+
+## Tech stack
+
+- **Web**: Next.js (App Router), React, Tailwind CSS
+- **Realtime**: Colyseus
+- **Language/build**: TypeScript, `tsx` (server dev), `tsup` (server bundling)
+
+## Getting started (local)
+
+### Install
+
+```bash
+npm install
+```
+
+### Run dev (web + game server)
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **Web**: `http://localhost:3000`
+- **Game server (Colyseus)**: check the console output for the port
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Run separately
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+# Web only
+npm run dev:next
 
-## Learn More
+# Game server only
+npm run dev:server
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Project structure (high-level)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `app/`: Next.js UI (routes/pages)
+- `src/client/`: Colyseus client + frontend logic
+- `src/game/`: shared game types/rules/geometry (client + server)
+- `src/server/`: Colyseus server (rooms, state, matchmaking logic)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Deployment
 
-## Deploy on Vercel
+- `npm run build`: build Next.js
+- `npm run build:colyseus`: bundle the Colyseus server
+- `docker/`, `infra/`, `scripts/`: container/infra/staging deployment assets
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## License
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT. See `LICENSE`.
