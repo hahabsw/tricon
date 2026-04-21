@@ -26,6 +26,18 @@ This repo contains both the web client (Next.js) and the realtime game server (C
 npm install
 ```
 
+### Run with Docker Compose (local)
+
+```bash
+docker compose up --build
+```
+
+### Run with Docker Compose (NAS)
+
+```bash
+docker compose -f docker-compose.nas.yml up --build
+```
+
 ### Run dev (web + game server)
 
 ```bash
