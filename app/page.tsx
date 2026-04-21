@@ -38,6 +38,15 @@ export default function Home() {
         <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-linear-to-r from-cyan-400 to-fuchsia-400 tracking-tighter drop-shadow-sm text-center">
           Tricon
         </h1>
+
+        <a
+          href="https://github.com/hahabsw/tricon"
+          target="_blank"
+          rel="noreferrer"
+          className="text-sm text-white/70 hover:text-white transition-colors underline underline-offset-4"
+        >
+          GitHub
+        </a>
         
         <div className="w-full flex flex-col space-y-4">
           <button 

@@ -119,7 +119,7 @@ export const leaveRoom = () => {
  * Schedule a deferred leave — gives React Strict Mode's remount
  * a chance to cancel before actually disconnecting.
  */
-export const leaveRoomDeferred = (delayMs = 100) => {
+export const leaveRoomDeferred = (delayMs = 10000) => {
   cancelPendingLeave();
   pendingLeaveTimer = setTimeout(() => {
     pendingLeaveTimer = null;

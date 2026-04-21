@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { Application, extend, useApplication } from '@pixi/react';
 import { Container, Graphics } from 'pixi.js';
 import { useGameStore } from '../store/gameStore';
@@ -21,8 +21,9 @@ const BoardRenderer = () => {
   const isMyTurn = myPlayerId === currentTurnPlayerId && phase === 'playing';
 
   // Board dimensions handling
-  const width = app.screen.width;
-  const height = app.screen.height;
+  const width = app?.screen.width ?? 0;
+  const height = app?.screen.height ?? 0;
+  
   const padding = 40;
   const usableWidth = width - padding * 2;
   const usableHeight = height - padding * 2;
@@ -41,6 +42,7 @@ const BoardRenderer = () => {
   };
 
   useEffect(() => {
+    if (!app) return;
     const canvas = app.canvas as HTMLCanvasElement;
     const handleMove = (e: PointerEvent) => {
       const rect = canvas.getBoundingClientRect();
@@ -110,6 +112,7 @@ const BoardRenderer = () => {
 
   // Main animation ticker
   useEffect(() => {
+    if (!app) return;
     const tick = () => {
       timeRef.current += app.ticker.deltaMS;
       const state = stateRef.current;
@@ -437,16 +440,19 @@ const BoardRenderer = () => {
 
 export const GameBoard = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [mounted, setMounted] = useState(false);
+  const isClient = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return <div className="w-full h-full bg-[#050510]" />;
+  if (!isClient) return <div className="w-full h-full bg-space-900" />;
 
   return (
-    <div ref={containerRef} className="w-full h-full relative border border-white/10 rounded-xl overflow-hidden shadow-[0_0_20px_rgba(0,0,0,0.5)] bg-[#050510]">
+    <div
+      ref={containerRef}
+      className="w-full h-full relative border border-white/10 rounded-xl overflow-hidden shadow-[0_0_20px_rgba(0,0,0,0.5)] bg-space-900"
+    >
       <Application background="#050510" resizeTo={containerRef} antialias>
         <BoardRenderer />
       </Application>

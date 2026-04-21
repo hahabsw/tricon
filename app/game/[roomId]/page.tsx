@@ -42,7 +42,8 @@ export default function GamePage() {
     return () => {
       mounted = false;
       initRef.current = false;
-      leaveRoomDeferred();
+      // Give users a short grace period for quick back/forward navigation.
+      leaveRoomDeferred(10000);
     };
   }, [roomId]);
 

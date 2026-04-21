@@ -12,6 +12,7 @@ export const ResultScreen = () => {
   if (!gameResult) return null;
 
   const handleLeave = () => {
+    // User explicitly leaves the room → disconnect immediately.
     leaveRoom();
     resetGame();
     router.push("/");
