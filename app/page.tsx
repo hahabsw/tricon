@@ -29,7 +29,7 @@ export default function Home() {
 
       <div className="relative z-10 mx-auto flex w-full max-w-2xl flex-col items-center px-4 py-10">
         <div className="flex w-full flex-col items-center space-y-6 glass p-6 sm:p-8 md:p-12 rounded-2xl border border-white/10 shadow-2xl">
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-linear-to-r from-cyan-400 to-fuchsia-400 tracking-tighter drop-shadow-sm text-center">
+        <h1 className="animated-gradient-text text-4xl sm:text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-linear-to-r from-cyan-400 via-emerald-300 to-fuchsia-400 tracking-tighter drop-shadow-sm text-center">
           Tricon
         </h1>
 
