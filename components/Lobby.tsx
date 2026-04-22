@@ -12,7 +12,7 @@ export const Lobby = () => {
   const [settings, setSettings] = useState<Partial<GameSettings>>({
     maxPlayers: 2,
     starCount: 40,
-    turnTimeSeconds: 30,
+    turnTimeSeconds: 20,
   });
   const [aiPlayers, setAIPlayers] = useState(0);
   const maxAI = (settings.maxPlayers ?? 2) - 1;
@@ -82,10 +82,10 @@ export const Lobby = () => {
         <div className="space-y-3 sm:space-y-4">
           <label className="text-xs sm:text-sm uppercase tracking-widest text-white/50 font-bold">Turn Timer</label>
           <div className="flex gap-2 sm:gap-4">
-            {[15, 30, 60].map(num => (
+            {[10, 20, 30].map(num => (
               <button
                 key={num}
-                onClick={() => setSettings({ ...settings, turnTimeSeconds: num as 15|30|60 })}
+                onClick={() => setSettings({ ...settings, turnTimeSeconds: num as 10|20|30 })}
                 className={`flex-1 py-3 sm:py-4 rounded-lg sm:rounded-xl border transition-all text-sm sm:text-base ${
                   settings.turnTimeSeconds === num
                     ? "bg-emerald-500/20 border-emerald-400 text-emerald-200 shadow-[0_0_15px_rgba(52,211,153,0.3)]"

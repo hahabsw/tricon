@@ -41,14 +41,14 @@ export class PlayerSchema extends Schema {
 export class GameSettingsSchema extends Schema {
   @type("uint8") maxPlayers: number = 2;
   @type("uint8") starCount: number = 40;
-  @type("uint8") turnTimeSeconds: number = 30;
+  @type("uint8") turnTimeSeconds: number = 20;
 }
 
 export class GameStateSchema extends Schema {
   @type("string") phase: string = "waiting";
   @type("string") currentTurnPlayerId: string = "";
   @type("uint16") turnNumber: number = 0;
-  @type("uint8") turnTimeLeft: number = 30;
+  @type("uint8") turnTimeLeft: number = 20;
   @type("uint8") consecutivePasses: number = 0;
 
   @type({ map: PlayerSchema }) players = new MapSchema<PlayerSchema>();

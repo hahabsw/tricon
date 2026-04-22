@@ -6,6 +6,7 @@ import { Container, Graphics } from 'pixi.js';
 import { useGameStore } from '../store/gameStore';
 import { sendPlaceEdge } from '../network/client';
 import { PLAYER_COLORS, MAX_CONNECTIONS_PER_STAR, MAX_EDGE_DISTANCE } from '../../game/state';
+import { validateEdge } from '../../game/rules';
 
 extend({ Container, Graphics });
 
@@ -13,7 +14,7 @@ extend({ Container, Graphics });
 const BoardRenderer = () => {
   const { app } = useApplication();
   const { 
-    stars, edges, triangles, myPlayerId, currentTurnPlayerId, phase,
+    stars, edges, triangles, myPlayerId, currentTurnPlayerId, phase, turnNumber,
     selectedStar, hoveredStar, selectStar, setHoveredStar, settings 
   } = useGameStore();
   
@@ -73,10 +74,10 @@ const BoardRenderer = () => {
     prevTrisCount.current = triangles.length;
   }, [triangles]);
 
-  const stateRef = useRef({ edges, triangles, stars, selectedStar, hoveredStar, mousePos, myPlayerId, isMyTurn, width, height, usableWidth, usableHeight, padding, settings });
+  const stateRef = useRef({ edges, triangles, stars, selectedStar, hoveredStar, mousePos, myPlayerId, isMyTurn, width, height, usableWidth, usableHeight, padding, settings, turnNumber });
   useEffect(() => {
-    stateRef.current = { edges, triangles, stars, selectedStar, hoveredStar, mousePos, myPlayerId, isMyTurn, width, height, usableWidth, usableHeight, padding, settings };
-  }, [edges, triangles, stars, selectedStar, hoveredStar, mousePos, myPlayerId, isMyTurn, width, height, usableWidth, usableHeight, padding, settings]);
+    stateRef.current = { edges, triangles, stars, selectedStar, hoveredStar, mousePos, myPlayerId, isMyTurn, width, height, usableWidth, usableHeight, padding, settings, turnNumber };
+  }, [edges, triangles, stars, selectedStar, hoveredStar, mousePos, myPlayerId, isMyTurn, width, height, usableWidth, usableHeight, padding, settings, turnNumber]);
 
   const selectionStartRef = useRef<number | null>(null);
   const prevSelectedRef = useRef<number | null>(null);
@@ -240,6 +241,26 @@ const BoardRenderer = () => {
           g.moveTo(p1.x, p1.y).lineTo(p2.x, p2.y).stroke({ color, width: 2 * widthMult, alpha: 0.9 * alphaMult });
         });
 
+        const lastCompletedTurn = state.turnNumber - 1;
+        if (lastCompletedTurn > 0) {
+          const pulse = 0.65 + 0.25 * Math.sin(time / 240);
+          state.edges
+            .filter((edge) => edge.turnNumber === lastCompletedTurn)
+            .forEach((edge) => {
+              const sA = state.stars.find((star) => star.id === edge.starA);
+              const sB = state.stars.find((star) => star.id === edge.starB);
+              if (!sA || !sB) return;
+
+              const p1 = getScreenCoords(sA.x, sA.y);
+              const p2 = getScreenCoords(sB.x, sB.y);
+              const color = getPlayerColorHex(edge.placedBy);
+
+              g.moveTo(p1.x, p1.y).lineTo(p2.x, p2.y).stroke({ color: 0xffffff, width: 12, alpha: 0.12 * pulse });
+              g.moveTo(p1.x, p1.y).lineTo(p2.x, p2.y).stroke({ color, width: 8, alpha: 0.18 * pulse });
+              g.moveTo(p1.x, p1.y).lineTo(p2.x, p2.y).stroke({ color: 0xffffff, width: 3, alpha: 0.9 * pulse });
+            });
+        }
+
         // Preview edge
         if (state.selectedStar !== null && state.isMyTurn) {
           const s1 = state.stars.find(s => s.id === state.selectedStar);
@@ -295,25 +316,49 @@ const BoardRenderer = () => {
         const g = starsGraphicsRef.current;
         g.clear();
         const maxDist = MAX_EDGE_DISTANCE[state.settings.starCount] ?? 0.30;
+        const deadStarIds = new Set(
+          state.stars
+            .filter((star) => {
+              if (star.connectionCount >= MAX_CONNECTIONS_PER_STAR) {
+                return true;
+              }
+
+              return !state.stars.some((other) => {
+                if (other.id === star.id) return false;
+                if (other.connectionCount >= MAX_CONNECTIONS_PER_STAR) return false;
+
+                const dx = star.x - other.x;
+                const dy = star.y - other.y;
+                if (Math.sqrt(dx * dx + dy * dy) > maxDist) {
+                  return false;
+                }
+
+                return (
+                  validateEdge(star.id, other.id, {
+                    phase: state.isMyTurn ? 'playing' : 'waiting',
+                    stars: state.stars,
+                    edges: state.edges,
+                    triangles: state.triangles,
+                    players: [],
+                    currentTurnIndex: 0,
+                    turnNumber: state.turnNumber,
+                    turnTimeLeft: 0,
+                    consecutivePasses: 0,
+                    scores: {},
+                    settings: state.settings,
+                  }) === null
+                );
+              });
+            })
+            .map((star) => star.id)
+        );
 
         state.stars.forEach(s => {
           const p = getScreenCoords(s.x, s.y);
           const isSelected = state.selectedStar === s.id;
           const isHovered = state.hoveredStar === s.id;
-          const isFull = s.connectionCount >= MAX_CONNECTIONS_PER_STAR;
           const remaining = MAX_CONNECTIONS_PER_STAR - s.connectionCount;
-
-          let isDead = isFull;
-          if (!isDead) {
-            const hasReachable = state.stars.some(other => {
-              if (other.id === s.id) return false;
-              if (other.connectionCount >= MAX_CONNECTIONS_PER_STAR) return false;
-              const dx = s.x - other.x;
-              const dy = s.y - other.y;
-              return Math.sqrt(dx * dx + dy * dy) <= maxDist;
-            });
-            if (!hasReachable) isDead = true;
-          }
+          const isDead = deadStarIds.has(s.id);
 
           let color = 0xffffff;
           if (isDead) color = 0x556677;

@@ -7,6 +7,7 @@ import { generateStars } from "../../game/geometry";
 import {
   calculateGameResult,
   checkGameEnd,
+  getValidMoves,
   getNextPlayerIndex,
   placeEdge,
   validateEdge,
@@ -255,7 +256,7 @@ export class GameRoom extends Room<{ state: GameStateSchema }> {
       return;
     }
 
-    this.advanceAfterPass();
+    this.forceRandomMoveOrAdvance();
   }
 
   private async startGame() {
@@ -349,7 +350,7 @@ export class GameRoom extends Room<{ state: GameStateSchema }> {
 
     this.turnTimeout = this.clock.setTimeout(() => {
       if (this.state.phase === "playing") {
-        this.advanceAfterPass();
+        this.forceRandomMoveOrAdvance();
       }
     }, durationMs);
 
@@ -508,10 +509,37 @@ export class GameRoom extends Room<{ state: GameStateSchema }> {
       ),
       turnTimeSeconds: this.pickAllowedValue(
         settings.turnTimeSeconds ?? options.turnTimeSeconds,
-        [15, 30, 60],
+        [10, 20, 30],
         DEFAULT_SETTINGS.turnTimeSeconds
       ),
     };
+  }
+
+
+  private forceRandomMoveOrAdvance() {
+    const plainState = this.toPlainState();
+    if (plainState.phase !== "playing") {
+      return;
+    }
+
+    const playerId = plainState.players[plainState.currentTurnIndex]?.id;
+    if (!playerId) {
+      return;
+    }
+
+    const validMoves = getValidMoves(plainState);
+    if (validMoves.length === 0) {
+      this.advanceAfterPass();
+      return;
+    }
+
+    const move = validMoves[Math.floor(Math.random() * validMoves.length)];
+    if (!move) {
+      this.advanceAfterPass();
+      return;
+    }
+
+    this.executeAIMove(playerId, move[0], move[1]);
   }
 
   private resolveAIPlayers(options: GameRoomOptions, maxPlayers: number): AIPlayerOption[] {

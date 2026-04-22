@@ -69,7 +69,7 @@ export interface GameState {
 export interface GameSettings {
   maxPlayers: 2 | 3 | 4;
   starCount: 30 | 40 | 50;
-  turnTimeSeconds: 15 | 30 | 60;
+  turnTimeSeconds: 10 | 20 | 30;
   fieldWidth: number; // logical field dimensions
   fieldHeight: number;
 }
@@ -124,7 +124,7 @@ export const MAX_EDGE_DISTANCE: Record<number, number> = {
 export const DEFAULT_SETTINGS: GameSettings = {
   maxPlayers: 2,
   starCount: 40,
-  turnTimeSeconds: 30,
+  turnTimeSeconds: 20,
   fieldWidth: 1,
   fieldHeight: 1,
 };

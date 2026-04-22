@@ -47,12 +47,12 @@ export const useGameStore = create<GameStoreState>((set) => ({
   turnOrder: [],
   currentTurnPlayerId: '',
   turnNumber: 0,
-  turnTimeLeft: 30,
+  turnTimeLeft: 20,
   consecutivePasses: 0,
   settings: {
     maxPlayers: 2,
     starCount: 40,
-    turnTimeSeconds: 30,
+    turnTimeSeconds: 20,
     fieldWidth: 1,
     fieldHeight: 1
   },
@@ -74,7 +74,7 @@ export const useGameStore = create<GameStoreState>((set) => ({
     turnOrder: [],
     currentTurnPlayerId: '',
     turnNumber: 0,
-    turnTimeLeft: 30,
+    turnTimeLeft: 20,
     consecutivePasses: 0,
     selectedStar: null,
     hoveredStar: null,
@@ -135,7 +135,7 @@ export const useGameStore = create<GameStoreState>((set) => ({
       settings: {
         maxPlayers: state.settings?.maxPlayers as 2|3|4 || 2,
         starCount: state.settings?.starCount as 30|40|50 || 40,
-        turnTimeSeconds: state.settings?.turnTimeSeconds as 15|30|60 || 30,
+        turnTimeSeconds: state.settings?.turnTimeSeconds as 10|20|30 || 20,
         fieldWidth: 1,
         fieldHeight: 1
       }

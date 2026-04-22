@@ -89,6 +89,9 @@ export default function Home() {
             <li>
               교차하는 선은 그을 수 없고, 같은 별 쌍은 중복 연결할 수 없어요.
             </li>
+            <li>
+              턴을 직접 넘기거나 시간을 초과하면 <span className="text-white font-semibold">가능한 선 중 하나가 랜덤으로 자동 배치</span>됩니다.
+            </li>
           </ul>
         </div>
         </div>

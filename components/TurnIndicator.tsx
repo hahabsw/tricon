@@ -9,6 +9,8 @@ export const TurnIndicator = () => {
     myPlayerId, 
     currentTurnPlayerId, 
     turnTimeLeft, 
+    turnNumber,
+    edges,
     players, 
     turnOrder,
     settings
@@ -18,10 +20,12 @@ export const TurnIndicator = () => {
   const turnIdx = turnOrder.indexOf(currentTurnPlayerId);
   const turnColor = PLAYER_COLORS[turnIdx] || "#ffffff";
   const player = players[currentTurnPlayerId];
+  const previousTurnEdge = edges.find((edge) => edge.turnNumber === turnNumber - 1);
+  const previousTurnPlayer = previousTurnEdge ? players[previousTurnEdge.placedBy] : null;
 
   // Calculate progress
   const progress = (turnTimeLeft / settings.turnTimeSeconds) * 100;
-  const isUrgent = turnTimeLeft <= 10;
+  const isUrgent = turnTimeLeft <= Math.min(5, settings.turnTimeSeconds);
 
   return (
     <div className="absolute bottom-2 sm:bottom-10 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center pointer-events-auto w-[calc(100%-1rem)] sm:w-auto max-w-md sm:max-w-none">
@@ -70,8 +74,15 @@ export const TurnIndicator = () => {
               onClick={() => sendPass()}
               className="px-6 sm:px-12 py-1.5 sm:py-3 rounded-full uppercase tracking-widest text-xs sm:text-sm font-bold bg-white/5 hover:bg-white/10 hover:text-white transition-all text-white/60 border border-white/10 hover:border-white/30"
             >
-              Skip Sequence
+              Random Move
             </button>
+          </div>
+        )}
+
+        {previousTurnEdge && (
+          <div className="border-t border-white/5 bg-white/[0.03] px-3 py-2 text-center text-[10px] sm:px-6 sm:text-xs uppercase tracking-[0.18em] text-white/55">
+            Last Move Highlighted
+            {previousTurnPlayer ? ` · ${previousTurnPlayer.name}` : ""}
           </div>
         )}
       </div>
