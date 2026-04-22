@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { GamePhase, Star, Edge, Triangle, Player, GameSettings } from '../../game/state';
+import { GamePhase, Star, Edge, Triangle, Player, GameSettings, GameResult } from '../../game/state';
 import { GameStateSchema, StarSchema, EdgeSchema, TriangleSchema, PlayerSchema } from '../../server/schema/GameState';
 
 export interface UIState {
@@ -7,6 +7,7 @@ export interface UIState {
   selectedStar: number | null;
   hoveredStar: number | null;
   roomId: string | null;
+  isPrivateRoom: boolean;
 }
 
 export interface GameStoreState extends UIState {
@@ -21,7 +22,7 @@ export interface GameStoreState extends UIState {
   turnTimeLeft: number;
   consecutivePasses: number;
   settings: GameSettings;
-  gameResult: any | null; // From custom messages
+  gameResult: GameResult | null; // From custom messages
   
   // Actions
   setMyPlayerId: (id: string) => void;
@@ -29,13 +30,14 @@ export interface GameStoreState extends UIState {
   selectStar: (starId: number | null) => void;
   setHoveredStar: (starId: number | null) => void;
   updateFromServer: (state: GameStateSchema) => void;
-  updateGameResult: (result: any) => void;
+  updateGameResult: (result: GameResult) => void;
   resetGame: () => void;
 }
 
 export const useGameStore = create<GameStoreState>((set) => ({
   myPlayerId: '',
   roomId: null,
+  isPrivateRoom: false,
   selectedStar: null,
   hoveredStar: null,
   
@@ -76,6 +78,7 @@ export const useGameStore = create<GameStoreState>((set) => ({
     turnNumber: 0,
     turnTimeLeft: 20,
     consecutivePasses: 0,
+    isPrivateRoom: false,
     selectedStar: null,
     hoveredStar: null,
     gameResult: null
@@ -123,6 +126,7 @@ export const useGameStore = create<GameStoreState>((set) => ({
 
     set({
       phase: state.phase as GamePhase,
+      isPrivateRoom: state.isPrivate,
       stars: mappedStars,
       edges: mappedEdges,
       triangles: mappedTriangles,

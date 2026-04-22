@@ -46,6 +46,7 @@ export class GameSettingsSchema extends Schema {
 
 export class GameStateSchema extends Schema {
   @type("string") phase: string = "waiting";
+  @type("boolean") isPrivate: boolean = false;
   @type("string") currentTurnPlayerId: string = "";
   @type("uint16") turnNumber: number = 0;
   @type("uint8") turnTimeLeft: number = 20;

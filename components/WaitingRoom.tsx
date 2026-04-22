@@ -5,7 +5,7 @@ import { sendReady } from "../src/client/network/client";
 import { PLAYER_COLORS } from "../src/game/state";
 
 export const WaitingRoom = () => {
-  const { players, roomId, myPlayerId, settings, turnOrder } = useGameStore();
+  const { players, roomId, myPlayerId, settings, isPrivateRoom } = useGameStore();
 
   const handleReady = () => {
     sendReady();
@@ -25,6 +25,13 @@ export const WaitingRoom = () => {
               Briefing Room
             </h2>
             <div className="flex flex-col items-start sm:items-end w-full sm:w-auto min-w-0">
+              <span className={`mb-2 inline-flex rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] ${
+                isPrivateRoom
+                  ? "bg-rose-500/15 text-rose-300 border border-rose-500/30"
+                  : "bg-emerald-500/15 text-emerald-300 border border-emerald-500/30"
+              }`}>
+                {isPrivateRoom ? "Private Room" : "Public Room"}
+              </span>
               <span className="text-white/40 uppercase tracking-[0.2em] text-[10px] sm:text-xs font-bold mb-1 sm:mb-2">Room Code</span>
               <div className="w-full sm:w-auto bg-black/50 px-4 sm:px-6 py-2 sm:py-3 rounded-lg border border-cyan-500/30 text-cyan-400 font-mono text-lg sm:text-2xl tracking-widest shadow-[0_0_20px_rgba(34,211,238,0.2)] break-all text-center sm:text-right">
                 {roomId}

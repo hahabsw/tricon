@@ -26,6 +26,17 @@ export const joinOrCreateRoom = async (roomName: string, options: JoinOptions) =
   }
 };
 
+export const createRoom = async (roomName: string, options: JoinOptions) => {
+  try {
+    const room = await colyseusClient.create<GameStateSchema>(roomName, options);
+    setupRoom(room);
+    return room;
+  } catch (e) {
+    console.error("Create error", e);
+    throw e;
+  }
+};
+
 const RECONNECT_TOKEN_KEY = 'tricon_reconnect_token';
 
 const saveReconnectToken = (room: Room<GameStateSchema>) => {

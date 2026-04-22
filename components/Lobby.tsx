@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { joinOrCreateRoom, leaveRoom } from "../src/client/network/client";
+import { createRoom, leaveRoom } from "../src/client/network/client";
 import { GameSettings } from "../src/game/state";
 
 export const Lobby = () => {
@@ -15,15 +15,18 @@ export const Lobby = () => {
     turnTimeSeconds: 20,
   });
   const [aiPlayers, setAIPlayers] = useState(0);
+  const [isPrivate, setIsPrivate] = useState(false);
   const maxAI = (settings.maxPlayers ?? 2) - 1;
 
   const handleCreate = async () => {
     setLoading(true);
     try {
       leaveRoom();
-      const room = await joinOrCreateRoom("game_room", { settings: { ...settings, aiPlayers } });
+      const room = await createRoom("game_room", {
+        settings: { ...settings, aiPlayers, isPrivate },
+      });
       router.push(`/game/${room.roomId}`);
-    } catch (e) {
+    } catch {
       alert("Failed to create room.");
       setLoading(false);
     }
@@ -120,6 +123,35 @@ export const Lobby = () => {
               {aiPlayers} AI + {(settings.maxPlayers ?? 2) - aiPlayers} human slot{(settings.maxPlayers ?? 2) - aiPlayers !== 1 ? "s" : ""}
             </p>
           )}
+        </div>
+
+        <div className="space-y-3 sm:space-y-4">
+          <label className="text-xs sm:text-sm uppercase tracking-widest text-white/50 font-bold">Visibility</label>
+          <div className="grid grid-cols-2 gap-2 sm:gap-4">
+            <button
+              onClick={() => setIsPrivate(false)}
+              className={`py-3 sm:py-4 rounded-lg sm:rounded-xl border transition-all text-sm sm:text-base ${
+                !isPrivate
+                  ? "bg-emerald-500/20 border-emerald-400 text-emerald-200 shadow-[0_0_15px_rgba(52,211,153,0.3)]"
+                  : "bg-black/40 border-white/10 text-white/70 hover:border-white/30"
+              }`}
+            >
+              Public
+            </button>
+            <button
+              onClick={() => setIsPrivate(true)}
+              className={`py-3 sm:py-4 rounded-lg sm:rounded-xl border transition-all text-sm sm:text-base ${
+                isPrivate
+                  ? "bg-rose-500/20 border-rose-400 text-rose-200 shadow-[0_0_15px_rgba(244,63,94,0.3)]"
+                  : "bg-black/40 border-white/10 text-white/70 hover:border-white/30"
+              }`}
+            >
+              Private
+            </button>
+          </div>
+          <p className="text-xs text-white/50">
+            Public rooms appear in the briefing room list. Private rooms can only be joined with the room code.
+          </p>
         </div>
       </div>
 

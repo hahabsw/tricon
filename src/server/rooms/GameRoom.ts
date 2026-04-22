@@ -21,6 +21,7 @@ import {
   type GameState,
   type Player,
 } from "../../game/state";
+import type { GameRoomMetadata, RoomVisibility } from "../../shared/roomListing";
 import {
   EdgeSchema,
   GameStateSchema,
@@ -41,29 +42,35 @@ type GameRoomOptions = Partial<
     Pick<GameSettings, "maxPlayers" | "starCount" | "turnTimeSeconds">
   > & {
     aiPlayers?: number | AIPlayerOption[];
+    isPrivate?: boolean;
   };
   aiPlayers?: number | AIPlayerOption[];
+  isPrivate?: boolean;
 };
 
 const MESSAGE_ERROR = "action_error";
 
-export class GameRoom extends Room<{ state: GameStateSchema }> {
+export class GameRoom extends Room<{ state: GameStateSchema; metadata: GameRoomMetadata }> {
   private turnTimeout?: Delayed;
   private turnCountdown?: Delayed;
   private aiTimeout?: Delayed;
   private configuredAIPlayers: AIPlayerOption[] = [];
+  private visibility: RoomVisibility = "public";
 
   onCreate(options: GameRoomOptions = {}) {
     const settings = this.resolveSettings(options);
+    this.visibility = this.resolveVisibility(options);
 
     this.state = new GameStateSchema();
     this.state.settings.maxPlayers = settings.maxPlayers;
     this.state.settings.starCount = settings.starCount;
     this.state.settings.turnTimeSeconds = settings.turnTimeSeconds;
     this.state.turnTimeLeft = settings.turnTimeSeconds;
+    this.state.isPrivate = this.visibility === "private";
 
     this.configuredAIPlayers = this.resolveAIPlayers(options, settings.maxPlayers);
     this.maxClients = Math.max(0, settings.maxPlayers - this.configuredAIPlayers.length);
+    void this.syncRoomListing();
 
     this.onMessage("ready", (client) => {
       this.handleReady(client);
@@ -95,6 +102,7 @@ export class GameRoom extends Room<{ state: GameStateSchema }> {
     this.state.turnOrder.push(player.id);
 
     this.ensurePlayableOrPause();
+    void this.syncRoomListing();
 
     if (this.clients.length >= this.maxClients) {
       await this.lock();
@@ -107,6 +115,7 @@ export class GameRoom extends Room<{ state: GameStateSchema }> {
       player.connected = false;
     }
     this.ensurePlayableOrPause();
+    void this.syncRoomListing();
   }
 
   async onLeave(client: Client, code?: number) {
@@ -115,6 +124,7 @@ export class GameRoom extends Room<{ state: GameStateSchema }> {
     if (this.state.phase === "waiting") {
       this.state.players.delete(client.sessionId);
       this.removeTurnOrderEntry(client.sessionId);
+      void this.syncRoomListing();
       if (this.clients.length < this.maxClients) {
         await this.unlock();
       }
@@ -129,6 +139,7 @@ export class GameRoom extends Room<{ state: GameStateSchema }> {
 
     player.connected = false;
     this.ensurePlayableOrPause();
+    void this.syncRoomListing();
 
     if (consented) {
       if (this.state.phase === "playing" && this.state.currentTurnPlayerId === client.sessionId) {
@@ -142,6 +153,7 @@ export class GameRoom extends Room<{ state: GameStateSchema }> {
       await this.allowReconnection(client, 60);
       player.connected = true;
       this.ensurePlayableOrPause();
+      void this.syncRoomListing();
     } catch {
       if (this.state.phase === "playing" && this.state.currentTurnPlayerId === client.sessionId) {
         this.advanceAfterPass();
@@ -176,6 +188,7 @@ export class GameRoom extends Room<{ state: GameStateSchema }> {
     }
 
     player.ready = true;
+    void this.syncRoomListing();
 
     if (this.canStartGame()) {
       void this.startGame();
@@ -284,6 +297,7 @@ export class GameRoom extends Room<{ state: GameStateSchema }> {
 
     this.syncFromPlainState(plainState);
     await this.lock();
+    await this.syncRoomListing();
     this.broadcast("game_started", { currentTurnPlayerId: this.state.currentTurnPlayerId });
     this.ensurePlayableOrPause();
     this.startTurnCycle();
@@ -326,6 +340,7 @@ export class GameRoom extends Room<{ state: GameStateSchema }> {
     plainState.turnTimeLeft = 0;
 
     this.syncFromPlainState(plainState);
+    void this.syncRoomListing();
     this.broadcast("game_finished", calculateGameResult(plainState));
   }
 
@@ -515,7 +530,6 @@ export class GameRoom extends Room<{ state: GameStateSchema }> {
     };
   }
 
-
   private forceRandomMoveOrAdvance() {
     const plainState = this.toPlainState();
     if (plainState.phase !== "playing") {
@@ -542,6 +556,11 @@ export class GameRoom extends Room<{ state: GameStateSchema }> {
     this.executeAIMove(playerId, move[0], move[1]);
   }
 
+  private resolveVisibility(options: GameRoomOptions): RoomVisibility {
+    const isPrivate = options.settings?.isPrivate ?? options.isPrivate ?? false;
+    return isPrivate ? "private" : "public";
+  }
+
   private resolveAIPlayers(options: GameRoomOptions, maxPlayers: number): AIPlayerOption[] {
     const aiPlayers = options.aiPlayers ?? options.settings?.aiPlayers;
 
@@ -559,6 +578,31 @@ export class GameRoom extends Room<{ state: GameStateSchema }> {
     }
 
     return [];
+  }
+
+  private buildRoomMetadata(): GameRoomMetadata {
+    const players = Array.from(this.state.players.values());
+    const host = players.find((player) => !player.isAI) ?? players[0];
+
+    return {
+      phase: this.state.phase as GameRoomMetadata["phase"],
+      visibility: this.visibility,
+      hostName: host?.name ?? "Waiting for host",
+      playerCount: players.length,
+      humanPlayerCount: players.filter((player) => !player.isAI).length,
+      aiPlayerCount: players.filter((player) => player.isAI).length,
+      maxPlayers: this.state.settings.maxPlayers,
+      starCount: this.state.settings.starCount,
+      turnTimeSeconds: this.state.settings.turnTimeSeconds,
+    };
+  }
+
+  private async syncRoomListing() {
+    await this.setMatchmaking({
+      private: this.visibility === "private",
+      unlisted: this.visibility === "private",
+      metadata: this.buildRoomMetadata(),
+    });
   }
 
   private pickAllowedValue<const T extends number>(

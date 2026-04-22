@@ -50,6 +50,14 @@ export default function Home() {
           >
             Create New Room
           </button>
+
+          <button
+            onClick={() => router.push("/briefing-rooms")}
+            disabled={loading}
+            className="w-full py-4 bg-emerald-500/10 hover:bg-emerald-500/20 transition-all rounded-lg font-bold text-base sm:text-lg border border-emerald-500/25 hover:border-emerald-400/50 text-emerald-100 shadow-[0_0_15px_rgba(16,185,129,0.12)]"
+          >
+            Browse Public Briefing Rooms
+          </button>
           
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
             <input 
