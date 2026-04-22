@@ -80,8 +80,10 @@ export default function GamePage() {
         <>
           <Scoreboard />
 
-          <div className="absolute inset-0 p-2 pt-20 pb-36 sm:p-8 sm:pt-32 sm:pb-48">
-            <GameBoard />
+          <div className="absolute inset-0 p-2 pt-20 pb-28 sm:p-8 sm:pt-32 sm:pb-48 flex items-center justify-center pointer-events-none">
+            <div className="pointer-events-auto w-full h-full flex items-center justify-center">
+              <GameBoard />
+            </div>
           </div>
 
           {phase === "playing" && <TurnIndicator />}

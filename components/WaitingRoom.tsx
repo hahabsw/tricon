@@ -21,12 +21,12 @@ export const WaitingRoom = () => {
         <div className="glass p-5 sm:p-10 md:p-12 rounded-2xl sm:rounded-3xl border border-white/10 shadow-[0_0_80px_rgba(0,0,0,1)] w-full max-w-3xl relative overflow-hidden">
 
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-6 sm:mb-12">
-            <h2 className="text-3xl sm:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-white/50 tracking-tight">
+            <h2 className="text-3xl sm:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-white/50 tracking-tight shrink-0">
               Briefing Room
             </h2>
-            <div className="flex flex-col items-start sm:items-end">
+            <div className="flex flex-col items-start sm:items-end w-full sm:w-auto min-w-0">
               <span className="text-white/40 uppercase tracking-[0.2em] text-[10px] sm:text-xs font-bold mb-1 sm:mb-2">Room Code</span>
-              <div className="bg-black/50 px-4 sm:px-6 py-2 sm:py-3 rounded-lg border border-cyan-500/30 text-cyan-400 font-mono text-lg sm:text-2xl tracking-widest shadow-[0_0_20px_rgba(34,211,238,0.2)]">
+              <div className="w-full sm:w-auto bg-black/50 px-4 sm:px-6 py-2 sm:py-3 rounded-lg border border-cyan-500/30 text-cyan-400 font-mono text-lg sm:text-2xl tracking-widest shadow-[0_0_20px_rgba(34,211,238,0.2)] break-all text-center sm:text-right">
                 {roomId}
               </div>
             </div>
