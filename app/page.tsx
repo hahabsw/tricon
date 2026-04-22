@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { joinRoomById } from "../src/client/network/client";
+// Network logic is handled by GamePage
 
 export default function Home() {
   const router = useRouter();
@@ -16,13 +16,7 @@ export default function Home() {
   const handleJoin = async () => {
     if (!joinCode) return;
     setLoading(true);
-    try {
-      const room = await joinRoomById(joinCode);
-      router.push(`/game/${room.roomId}`);
-    } catch (e) {
-      alert("Failed to join room.");
-      setLoading(false);
-    }
+    router.push(`/game/${joinCode}`);
   };
 
   return (

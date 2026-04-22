@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { joinOrCreateRoom } from "../src/client/network/client";
+import { joinOrCreateRoom, leaveRoom } from "../src/client/network/client";
 import { GameSettings } from "../src/game/state";
 
 export const Lobby = () => {
@@ -20,6 +20,7 @@ export const Lobby = () => {
   const handleCreate = async () => {
     setLoading(true);
     try {
+      leaveRoom();
       const room = await joinOrCreateRoom("game_room", { settings: { ...settings, aiPlayers } });
       router.push(`/game/${room.roomId}`);
     } catch (e) {
