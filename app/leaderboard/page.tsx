@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { getPlayerId } from "../../src/client/identity";
 import type { AIDifficulty } from "../../src/game/state";
@@ -46,12 +46,48 @@ function buildQuery(
   return params.toString();
 }
 
+const MODE_SET: Mode[] = ["pvp", "easy", "normal", "hard"];
+const METRIC_SET: Metric[] = ["best_score", "wins"];
+const PERIOD_SET: Period[] = ["all", "weekly"];
+const STAR_SET: StarCount[] = [30, 40, 50];
+
+function pickOr<T extends string | number>(
+  raw: string | null,
+  allowed: readonly T[],
+  fallback: T
+): T {
+  if (raw === null) return fallback;
+  for (const a of allowed) {
+    if (String(a) === raw) return a;
+  }
+  return fallback;
+}
+
 export default function LeaderboardPage() {
+  return (
+    <Suspense fallback={<div className="min-h-dvh bg-[#050510]" />}>
+      <LeaderboardInner />
+    </Suspense>
+  );
+}
+
+function LeaderboardInner() {
   const router = useRouter();
-  const [mode, setMode] = useState<Mode>("pvp");
-  const [starCount, setStarCount] = useState<StarCount>(40);
-  const [metric, setMetric] = useState<Metric>("best_score");
-  const [period, setPeriod] = useState<Period>("all");
+  const searchParams = useSearchParams();
+
+  const mode = pickOr<Mode>(searchParams.get("mode"), MODE_SET, "pvp");
+  const metric = pickOr<Metric>(searchParams.get("metric"), METRIC_SET, "best_score");
+  const period = pickOr<Period>(searchParams.get("period"), PERIOD_SET, "all");
+  const starCount = pickOr<StarCount>(searchParams.get("starCount"), STAR_SET, 40);
+
+  const updateFilter = (patch: Partial<{ mode: Mode; metric: Metric; period: Period; starCount: StarCount }>) => {
+    const params = new URLSearchParams(searchParams.toString());
+    Object.entries(patch).forEach(([k, v]) => {
+      if (v !== undefined) params.set(k, String(v));
+    });
+    router.replace(`/leaderboard?${params.toString()}`, { scroll: false });
+  };
+
   const [rows, setRows] = useState<LeaderboardRow[]>([]);
   const [loading, setLoading] = useState(false);
   const [myId, setMyId] = useState("");
@@ -116,7 +152,7 @@ export default function LeaderboardPage() {
             {MODE_TABS.map((tab) => (
               <button
                 key={tab.key}
-                onClick={() => setMode(tab.key)}
+                onClick={() => updateFilter({ mode: tab.key })}
                 className={`py-2 sm:py-3 rounded-lg border text-xs sm:text-sm font-bold transition-all ${
                   mode === tab.key
                     ? "bg-rose-500/20 border-rose-400 text-rose-200 shadow-[0_0_15px_rgba(244,63,94,0.3)]"
@@ -132,7 +168,7 @@ export default function LeaderboardPage() {
             {STAR_TABS.map((n) => (
               <button
                 key={n}
-                onClick={() => setStarCount(n)}
+                onClick={() => updateFilter({ starCount: n })}
                 className={`flex-1 min-w-[60px] py-2 rounded-lg border text-xs sm:text-sm font-bold transition-all ${
                   starCount === n
                     ? "bg-fuchsia-500/20 border-fuchsia-400 text-fuchsia-200"
@@ -149,7 +185,7 @@ export default function LeaderboardPage() {
               {(["best_score", "wins"] as Metric[]).map((m) => (
                 <button
                   key={m}
-                  onClick={() => setMetric(m)}
+                  onClick={() => updateFilter({ metric: m })}
                   className={`py-2 rounded-lg border text-xs sm:text-sm font-bold transition-all ${
                     metric === m
                       ? "bg-cyan-500/20 border-cyan-400 text-cyan-200"
@@ -164,7 +200,7 @@ export default function LeaderboardPage() {
               {(["all", "weekly"] as Period[]).map((p) => (
                 <button
                   key={p}
-                  onClick={() => setPeriod(p)}
+                  onClick={() => updateFilter({ period: p })}
                   className={`py-2 rounded-lg border text-xs sm:text-sm font-bold transition-all ${
                     period === p
                       ? "bg-emerald-500/20 border-emerald-400 text-emerald-200"

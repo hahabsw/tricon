@@ -119,7 +119,7 @@ export const ResultScreen = () => {
             )}
 
             <div className="w-full space-y-3 sm:space-y-6 mb-8 sm:mb-16">
-              {rankings.map((rank: any, idx: number) => {
+              {rankings.map((rank, idx) => {
                 const p = players[rank.playerId];
                 const isMe = rank.playerId === myPlayerId;
                 const color = PLAYER_COLORS[idx] || "#ffffff";
