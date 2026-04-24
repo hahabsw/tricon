@@ -3,6 +3,8 @@ services:
     build:
       context: .
       dockerfile: docker/web.prebuilt.Dockerfile
+    environment:
+      COLYSEUS_INTERNAL_URL: "ws://colyseus:2567"
     restart: always
     ports:
       - "3100:3000"
