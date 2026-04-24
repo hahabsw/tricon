@@ -2,7 +2,7 @@ import { ArraySchema, MapSchema } from "@colyseus/schema";
 import type { Delayed } from "@colyseus/timer";
 import { Room, type Client } from "colyseus";
 
-import { chooseMove } from "../../game/ai/easy";
+import { chooseMove } from "../../game/ai";
 import { generateStars } from "../../game/geometry";
 import {
   calculateGameResult,
@@ -380,7 +380,8 @@ export class GameRoom extends Room<{ state: GameStateSchema; metadata: GameRoomM
         }
 
         const plainState = this.toPlainState();
-        const move = chooseMove(plainState);
+        const difficulty = (currentPlayer.aiDifficulty as AIDifficulty) || "easy";
+        const move = chooseMove(plainState, difficulty);
 
         if (move) {
           this.executeAIMove(currentPlayer.id, move[0], move[1]);

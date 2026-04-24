@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createRoom, leaveRoom } from "../src/client/network/client";
-import { GameSettings } from "../src/game/state";
+import { AIDifficulty, GameSettings } from "../src/game/state";
 
 export const Lobby = () => {
   const router = useRouter();
@@ -15,6 +15,7 @@ export const Lobby = () => {
     turnTimeSeconds: 20,
   });
   const [aiPlayers, setAIPlayers] = useState(0);
+  const [aiDifficulty, setAIDifficulty] = useState<AIDifficulty>("easy");
   const [isPrivate, setIsPrivate] = useState(false);
   const maxAI = (settings.maxPlayers ?? 2) - 1;
 
@@ -22,8 +23,12 @@ export const Lobby = () => {
     setLoading(true);
     try {
       leaveRoom();
+      const aiPlayerOptions =
+        aiPlayers > 0
+          ? Array.from({ length: aiPlayers }, () => ({ difficulty: aiDifficulty }))
+          : 0;
       const room = await createRoom("game_room", {
-        settings: { ...settings, aiPlayers, isPrivate },
+        settings: { ...settings, aiPlayers: aiPlayerOptions, isPrivate },
       });
       router.push(`/game/${room.roomId}`);
     } catch {
@@ -124,6 +129,27 @@ export const Lobby = () => {
             </p>
           )}
         </div>
+
+        {aiPlayers > 0 && (
+          <div className="space-y-3 sm:space-y-4">
+            <label className="text-xs sm:text-sm uppercase tracking-widest text-white/50 font-bold">AI Difficulty</label>
+            <div className="grid grid-cols-3 gap-2 sm:gap-4">
+              {(["easy", "normal", "hard"] as const).map((level) => (
+                <button
+                  key={level}
+                  onClick={() => setAIDifficulty(level)}
+                  className={`py-3 sm:py-4 rounded-lg sm:rounded-xl border transition-all text-sm sm:text-base capitalize ${
+                    aiDifficulty === level
+                      ? "bg-rose-500/20 border-rose-400 text-rose-200 shadow-[0_0_15px_rgba(244,63,94,0.3)]"
+                      : "bg-black/40 border-white/10 text-white/70 hover:border-white/30"
+                  }`}
+                >
+                  {level}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="space-y-3 sm:space-y-4">
           <label className="text-xs sm:text-sm uppercase tracking-widest text-white/50 font-bold">Visibility</label>
