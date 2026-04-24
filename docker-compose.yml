@@ -26,9 +26,6 @@ services:
     build:
       context: .
       dockerfile: docker/web.Dockerfile
-      args:
-        NEXT_PUBLIC_BASE_URL: "http://localhost:3000"
-        NEXT_PUBLIC_COLYSEUS_URL: "ws://localhost:2567"
     environment:
       COLYSEUS_INTERNAL_URL: "ws://colyseus:2567"
       TRICON_DB_PATH: /app/data/tricon.db

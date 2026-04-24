@@ -16,11 +16,18 @@ function withIdentity(options: JoinOptions = {}): JoinOptions {
 
 const getEndpoint = () => {
   const envUrl = process.env.NEXT_PUBLIC_COLYSEUS_URL?.trim().replace(/\/+$/, '');
-  if (envUrl) return envUrl;
   if (typeof window !== 'undefined') {
+    if (envUrl) {
+      const configuredHost = new URL(envUrl).hostname;
+      const isLocalConfiguredHost = configuredHost === 'localhost' || configuredHost === '127.0.0.1';
+      const isLocalBrowserHost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      if (!isLocalConfiguredHost || isLocalBrowserHost) return envUrl;
+    }
+
     const scheme = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     return `${scheme}//${window.location.hostname}:2567`;
   }
+  if (envUrl) return envUrl;
   return 'ws://localhost:2567';
 };
 
