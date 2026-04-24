@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { AnimatedBackground } from "../components/AnimatedBackground";
 import { getNickname, setNickname } from "../src/client/identity";
 // Network logic is handled by GamePage
 
@@ -42,8 +43,8 @@ export default function Home() {
 
   return (
     <div className="relative min-h-dvh w-full overflow-x-hidden bg-space-900">
-      {/* Background decoration */}
-      <div className="absolute inset-0 z-0 opacity-20">
+      <AnimatedBackground />
+      <div className="absolute inset-0 z-0 opacity-20 pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500/30 rounded-full blur-[120px]" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-fuchsia-500/30 rounded-full blur-[120px]" />
       </div>

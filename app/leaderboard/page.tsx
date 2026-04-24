@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
+import { AnimatedBackground } from "../../components/AnimatedBackground";
 import { getPlayerId } from "../../src/client/identity";
 import type { AIDifficulty } from "../../src/game/state";
 
@@ -128,6 +129,7 @@ function LeaderboardInner() {
 
   return (
     <div className="relative min-h-dvh w-full overflow-x-hidden bg-[#050510] text-white">
+      <AnimatedBackground />
       <div className="absolute inset-0 z-0 opacity-20 pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-amber-500/30 rounded-full blur-[120px]" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-fuchsia-500/30 rounded-full blur-[120px]" />
