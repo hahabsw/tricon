@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { GamePhase, Star, Edge, Triangle, Player, GameSettings, GameResult } from '../../game/state';
+import { AIDifficulty, GamePhase, Star, Edge, Triangle, Player, GameSettings, GameResult } from '../../game/state';
 import { GameStateSchema, StarSchema, EdgeSchema, TriangleSchema, PlayerSchema } from '../../server/schema/GameState';
 
 export interface UIState {
@@ -117,6 +117,7 @@ export const useGameStore = create<GameStoreState>((set) => ({
           name: p.name,
           color: p.color,
           isAI: p.isAI,
+          aiDifficulty: p.aiDifficulty ? (p.aiDifficulty as AIDifficulty) : undefined,
           connected: p.connected,
           ready: p.ready,
           score: p.score,

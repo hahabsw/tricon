@@ -13,11 +13,13 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@colyseus/sdk": "^0.17.41",
     "@colyseus/schema": "^4.0.20",
+    "@colyseus/sdk": "^0.17.41",
     "@colyseus/ws-transport": "^0.17.13",
     "@pixi/react": "^8.0.5",
+    "better-sqlite3": "^12.9.0",
     "colyseus": "^0.17.9",
+    "drizzle-orm": "^0.45.2",
     "next": "16.1.4",
     "pixi.js": "^8.18.1",
     "react": "19.2.3",
@@ -26,11 +28,13 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/better-sqlite3": "^7.6.13",
     "@types/express": "^5.0.6",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "concurrently": "^9.2.1",
+    "drizzle-kit": "^0.31.10",
     "eslint": "^9",
     "eslint-config-next": "16.1.4",
     "tailwindcss": "^4",

@@ -38,6 +38,7 @@ export interface Triangle {
 /** Player information */
 export interface Player {
   id: string;
+  userId?: string;
   name: string;
   color: string;
   isAI: boolean;

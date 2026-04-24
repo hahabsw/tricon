@@ -1,6 +1,18 @@
 import { Client, JoinOptions, Room } from '@colyseus/sdk';
 import { GameStateSchema } from '../../server/schema/GameState';
+import { getIdentity } from '../identity';
 import { useGameStore } from '../store/gameStore';
+
+function withIdentity(options: JoinOptions = {}): JoinOptions {
+  if (typeof window === 'undefined') return options;
+  const { playerId, nickname } = getIdentity();
+  const opts = options as JoinOptions & { playerId?: string; name?: string };
+  return {
+    ...options,
+    playerId: opts.playerId ?? playerId,
+    name: opts.name ?? nickname,
+  };
+}
 
 const getEndpoint = () => {
   const envUrl = process.env.NEXT_PUBLIC_COLYSEUS_URL?.trim().replace(/\/+$/, '');
@@ -18,7 +30,7 @@ let currentRoom: Room<GameStateSchema> | null = null;
 
 export const joinOrCreateRoom = async (roomName: string, options: JoinOptions) => {
   try {
-    const room = await colyseusClient.joinOrCreate<GameStateSchema>(roomName, options);
+    const room = await colyseusClient.joinOrCreate<GameStateSchema>(roomName, withIdentity(options));
     setupRoom(room);
     return room;
   } catch (e) {
@@ -29,7 +41,7 @@ export const joinOrCreateRoom = async (roomName: string, options: JoinOptions) =
 
 export const createRoom = async (roomName: string, options: JoinOptions) => {
   try {
-    const room = await colyseusClient.create<GameStateSchema>(roomName, options);
+    const room = await colyseusClient.create<GameStateSchema>(roomName, withIdentity(options));
     setupRoom(room);
     return room;
   } catch (e) {
@@ -72,7 +84,7 @@ export const reconnectRoom = async (roomId: string) => {
 
 export const joinRoomById = async (roomId: string, options?: JoinOptions) => {
   try {
-    const room = await colyseusClient.joinById<GameStateSchema>(roomId, options);
+    const room = await colyseusClient.joinById<GameStateSchema>(roomId, withIdentity(options));
     setupRoom(room);
     return room;
   } catch (e) {

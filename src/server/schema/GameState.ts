@@ -29,6 +29,7 @@ export class TriangleSchema extends Schema {
 
 export class PlayerSchema extends Schema {
   @type("string") id: string = "";
+  @type("string") userId: string = "";
   @type("string") name: string = "";
   @type("string") color: string = "";
   @type("boolean") isAI: boolean = false;

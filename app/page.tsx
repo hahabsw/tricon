@@ -1,20 +1,41 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getNickname, setNickname } from "../src/client/identity";
 // Network logic is handled by GamePage
 
 export default function Home() {
   const router = useRouter();
   const [joinCode, setJoinCode] = useState("");
   const [loading, setLoading] = useState(false);
+  const [nickname, setNicknameState] = useState("");
+
+  useEffect(() => {
+    setNicknameState(getNickname());
+  }, []);
+
+  const handleNicknameChange = (value: string) => {
+    const saved = setNickname(value);
+    setNicknameState(saved);
+  };
+
+  const ensureNickname = () => {
+    if (nickname.trim().length === 0) {
+      alert("닉네임을 입력해주세요.");
+      return false;
+    }
+    return true;
+  };
 
   const handleCreate = () => {
+    if (!ensureNickname()) return;
     router.push("/lobby");
   };
 
   const handleJoin = async () => {
     if (!joinCode) return;
+    if (!ensureNickname()) return;
     setLoading(true);
     router.push(`/game/${joinCode}`);
   };
@@ -43,7 +64,19 @@ export default function Home() {
         </a>
         
         <div className="w-full flex flex-col space-y-4">
-          <button 
+          <div className="flex flex-col gap-2">
+            <label className="text-xs uppercase tracking-widest text-white/50 font-bold px-1">Nickname</label>
+            <input
+              type="text"
+              placeholder="Enter your nickname"
+              value={nickname}
+              maxLength={16}
+              onChange={(e) => handleNicknameChange(e.target.value)}
+              className="bg-black/40 border border-white/10 rounded-lg px-4 py-3 outline-none focus:border-cyan-400 transition-colors tracking-wide"
+            />
+          </div>
+
+          <button
             onClick={handleCreate}
             disabled={loading}
             className="w-full py-4 bg-white/10 hover:bg-white/20 transition-all rounded-lg font-bold text-base sm:text-lg border border-white/20 hover:border-white/40 shadow-[0_0_15px_rgba(255,255,255,0.1)]"
@@ -57,6 +90,14 @@ export default function Home() {
             className="w-full py-4 bg-emerald-500/10 hover:bg-emerald-500/20 transition-all rounded-lg font-bold text-base sm:text-lg border border-emerald-500/25 hover:border-emerald-400/50 text-emerald-100 shadow-[0_0_15px_rgba(16,185,129,0.12)]"
           >
             Browse Public Briefing Rooms
+          </button>
+
+          <button
+            onClick={() => router.push("/leaderboard")}
+            disabled={loading}
+            className="w-full py-4 bg-amber-500/10 hover:bg-amber-500/20 transition-all rounded-lg font-bold text-base sm:text-lg border border-amber-500/25 hover:border-amber-400/50 text-amber-100 shadow-[0_0_15px_rgba(245,158,11,0.12)]"
+          >
+            Leaderboard
           </button>
           
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">

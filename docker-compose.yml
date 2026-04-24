@@ -8,6 +8,9 @@ services:
       - "2567:2567"
     environment:
       NODE_ENV: production
+      TRICON_DB_PATH: /app/data/tricon.db
+    volumes:
+      - ./data:/app/data
 
   web:
     build:
@@ -18,9 +21,12 @@ services:
         NEXT_PUBLIC_COLYSEUS_URL: "ws://localhost:2567"
     environment:
       COLYSEUS_INTERNAL_URL: "ws://colyseus:2567"
+      TRICON_DB_PATH: /app/data/tricon.db
     restart: unless-stopped
     ports:
       - "3000:3000"
+    volumes:
+      - ./data:/app/data
     depends_on:
       colyseus:
         condition: service_started

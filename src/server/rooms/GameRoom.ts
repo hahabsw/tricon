@@ -3,6 +3,7 @@ import type { Delayed } from "@colyseus/timer";
 import { Room, type Client } from "colyseus";
 
 import { chooseMove } from "../../game/ai";
+import { recordGameResult } from "../db/leaderboard";
 import { generateStars } from "../../game/geometry";
 import {
   calculateGameResult,
@@ -88,9 +89,10 @@ export class GameRoom extends Room<{ state: GameStateSchema; metadata: GameRoomM
     });
   }
 
-  async onJoin(client: Client, options?: { name?: string }) {
+  async onJoin(client: Client, options?: { name?: string; playerId?: string }) {
     const player = new PlayerSchema();
     player.id = client.sessionId;
+    player.userId = options?.playerId?.trim() ?? "";
     player.name = options?.name?.trim() || `Player ${this.state.turnOrder.length + 1}`;
     player.color = this.getNextAvailableColor();
     player.connected = true;
@@ -341,7 +343,43 @@ export class GameRoom extends Room<{ state: GameStateSchema; metadata: GameRoomM
 
     this.syncFromPlainState(plainState);
     void this.syncRoomListing();
-    this.broadcast("game_finished", calculateGameResult(plainState));
+    const result = calculateGameResult(plainState);
+    this.persistResult(plainState, result);
+    this.broadcast("game_finished", result);
+  }
+
+  private persistResult(
+    plainState: GameState,
+    result: ReturnType<typeof calculateGameResult>
+  ) {
+    try {
+      const rankBySessionId = new Map(
+        result.rankings.map((r) => [r.playerId, r.rank])
+      );
+      const schemaByPlayerId = this.state.players;
+
+      const entries = plainState.players.map((p) => {
+        const schemaPlayer = schemaByPlayerId.get(p.id);
+        const identityId = schemaPlayer?.userId?.trim() || p.id;
+        return {
+          playerId: p.isAI ? p.id : identityId,
+          nickname: p.name,
+          score: plainState.scores[p.id] ?? 0,
+          rank: rankBySessionId.get(p.id) ?? plainState.players.length,
+          isAi: p.isAI,
+          aiDifficulty: p.aiDifficulty,
+        };
+      });
+
+      recordGameResult({
+        gameId: `${this.roomId}-${Date.now()}`,
+        finishedAt: Date.now(),
+        starCount: plainState.settings.starCount,
+        entries,
+      });
+    } catch (error) {
+      console.error("Failed to persist game result", error);
+    }
   }
 
   private startTurnCycle() {
@@ -626,6 +664,7 @@ export class GameRoom extends Room<{ state: GameStateSchema; metadata: GameRoomM
 
     const players: Player[] = orderedPlayers.map((player) => ({
       id: player.id,
+      userId: player.userId || undefined,
       name: player.name,
       color: player.color,
       isAI: player.isAI,
@@ -688,6 +727,7 @@ export class GameRoom extends Room<{ state: GameStateSchema; metadata: GameRoomM
     state.players.forEach((player) => {
       const playerSchema = new PlayerSchema();
       playerSchema.id = player.id;
+      playerSchema.userId = player.userId ?? "";
       playerSchema.name = player.name;
       playerSchema.color = player.color;
       playerSchema.isAI = player.isAI;
