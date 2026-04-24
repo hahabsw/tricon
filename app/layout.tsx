@@ -1,6 +1,7 @@
 import './globals.css';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import type { Viewport } from 'next';
+import { AppChrome } from '../components/AppChrome';
 
 export const metadata = {
   title: 'Tricon',
@@ -20,7 +21,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className="dark">
       <body className="min-h-dvh w-full bg-space-900 text-white">
-        {children}
+        <AppChrome>{children}</AppChrome>
       </body>
     </html>
   );

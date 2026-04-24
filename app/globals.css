@@ -58,8 +58,27 @@ body.game-lock {
   animation: gradient-shift 6s ease-in-out infinite;
 }
 
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-transition {
+  animation: page-enter 220ms ease-out both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animated-gradient-text {
+    animation: none;
+  }
+
+  .page-transition {
     animation: none;
   }
 }

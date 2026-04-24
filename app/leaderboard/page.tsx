@@ -3,7 +3,6 @@
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import { AnimatedBackground } from "../../components/AnimatedBackground";
 import { getPlayerId } from "../../src/client/identity";
 import type { AIDifficulty } from "../../src/game/state";
 
@@ -91,11 +90,7 @@ function LeaderboardInner() {
 
   const [rows, setRows] = useState<LeaderboardRow[]>([]);
   const [loading, setLoading] = useState(false);
-  const [myId, setMyId] = useState("");
-
-  useEffect(() => {
-    setMyId(getPlayerId());
-  }, []);
+  const [myId] = useState(() => (typeof window === "undefined" ? "" : getPlayerId()));
 
   const queryString = useMemo(
     () => buildQuery(mode, metric, period, starCount),
@@ -104,19 +99,23 @@ function LeaderboardInner() {
 
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
-    fetch(`/api/leaderboard?${queryString}`)
-      .then((r) => r.json())
-      .then((data) => {
+
+    const loadRows = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(`/api/leaderboard?${queryString}`);
+        const data = await response.json();
         if (cancelled) return;
         setRows(Array.isArray(data.rows) ? data.rows : []);
-      })
-      .catch(() => {
+      } catch {
         if (!cancelled) setRows([]);
-      })
-      .finally(() => {
+      } finally {
         if (!cancelled) setLoading(false);
-      });
+      }
+    };
+
+    void loadRows();
+
     return () => {
       cancelled = true;
     };
@@ -128,13 +127,7 @@ function LeaderboardInner() {
   };
 
   return (
-    <div className="relative min-h-dvh w-full overflow-x-hidden bg-[#050510] text-white">
-      <AnimatedBackground />
-      <div className="absolute inset-0 z-0 opacity-20 pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-amber-500/30 rounded-full blur-[120px]" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-fuchsia-500/30 rounded-full blur-[120px]" />
-      </div>
-
+    <div className="relative min-h-dvh w-full overflow-x-hidden text-white">
       <div className="relative z-10 mx-auto flex w-full max-w-3xl flex-col px-4 py-6 sm:py-10">
         <div className="flex items-center justify-between mb-6">
           <button

@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import { AnimatedBackground } from "../../components/AnimatedBackground";
 import { joinRoomById } from "../../src/client/network/client";
 import type { PublicRoomSummary } from "../../src/shared/roomListing";
 
@@ -84,13 +83,7 @@ export default function BriefingRoomsPage() {
   };
 
   return (
-    <div className="relative min-h-dvh overflow-hidden bg-[#050510] text-white">
-      <AnimatedBackground />
-      <div className="absolute inset-0 opacity-20 pointer-events-none">
-        <div className="absolute top-24 left-1/4 h-72 w-72 rounded-full bg-cyan-500/20 blur-[120px]" />
-        <div className="absolute bottom-16 right-1/4 h-80 w-80 rounded-full bg-emerald-500/20 blur-[140px]" />
-      </div>
-
+    <div className="relative min-h-dvh overflow-hidden text-white">
       <div className="relative z-10 mx-auto flex min-h-dvh w-full max-w-6xl flex-col px-4 py-10 sm:px-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>

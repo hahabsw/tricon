@@ -1,8 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { AnimatedBackground } from "../components/AnimatedBackground";
+import { useState } from "react";
 import { getNickname, setNickname } from "../src/client/identity";
 // Network logic is handled by GamePage
 
@@ -10,11 +9,9 @@ export default function Home() {
   const router = useRouter();
   const [joinCode, setJoinCode] = useState("");
   const [loading, setLoading] = useState(false);
-  const [nickname, setNicknameState] = useState("");
-
-  useEffect(() => {
-    setNicknameState(getNickname());
-  }, []);
+  const [nickname, setNicknameState] = useState(() =>
+    typeof window === "undefined" ? "" : getNickname()
+  );
 
   const handleNicknameChange = (value: string) => {
     const saved = setNickname(value);
@@ -42,13 +39,7 @@ export default function Home() {
   };
 
   return (
-    <div className="relative min-h-dvh w-full overflow-x-hidden bg-space-900">
-      <AnimatedBackground />
-      <div className="absolute inset-0 z-0 opacity-20 pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500/30 rounded-full blur-[120px]" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-fuchsia-500/30 rounded-full blur-[120px]" />
-      </div>
-
+    <div className="relative min-h-dvh w-full overflow-x-hidden">
       <div className="relative z-10 mx-auto flex w-full max-w-2xl flex-col items-center px-4 py-10">
         <div className="flex w-full flex-col items-center space-y-6 glass p-6 sm:p-8 md:p-12 rounded-2xl border border-white/10 shadow-2xl">
         <h1 className="animated-gradient-text text-4xl sm:text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-linear-to-r from-cyan-400 via-emerald-300 to-fuchsia-400 tracking-tighter drop-shadow-sm text-center">
