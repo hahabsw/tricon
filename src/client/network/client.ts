@@ -3,10 +3,11 @@ import { GameStateSchema } from '../../server/schema/GameState';
 import { useGameStore } from '../store/gameStore';
 
 const getEndpoint = () => {
-  const envUrl = process.env.NEXT_PUBLIC_COLYSEUS_URL;
+  const envUrl = process.env.NEXT_PUBLIC_COLYSEUS_URL?.trim().replace(/\/+$/, '');
   if (envUrl) return envUrl;
   if (typeof window !== 'undefined') {
-    return `ws://${window.location.hostname}:2567`;
+    const scheme = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    return `${scheme}//${window.location.hostname}:2567`;
   }
   return 'ws://localhost:2567';
 };
