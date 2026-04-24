@@ -1,11 +1,4 @@
 services:
-  data-init:
-    image: busybox:1.36
-    command: sh -c "mkdir -p /data && chown -R 1001:1001 /data"
-    user: "0"
-    volumes:
-      - ./data:/data
-
   web:
     build:
       context: .
@@ -21,8 +14,6 @@ services:
     depends_on:
       colyseus:
         condition: service_started
-      data-init:
-        condition: service_completed_successfully
 
   colyseus:
     build:
@@ -36,6 +27,3 @@ services:
       TRICON_DB_PATH: /app/data/tricon.db
     volumes:
       - ./data:/app/data
-    depends_on:
-      data-init:
-        condition: service_completed_successfully
