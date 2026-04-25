@@ -14,23 +14,13 @@ function withIdentity(options: JoinOptions = {}): JoinOptions {
   };
 }
 
-const isLocalHost = (hostname: string) => hostname === 'localhost' || hostname === '127.0.0.1';
-
-const getUrlHostname = (rawUrl: string) => {
-  try {
-    return new URL(rawUrl).hostname;
-  } catch {
-    return null;
-  }
-};
-
 const getEndpoint = () => {
   const envUrl = process.env.NEXT_PUBLIC_COLYSEUS_URL?.trim().replace(/\/+$/, '');
   if (typeof window !== 'undefined') {
     if (envUrl) {
-      const configuredHost = getUrlHostname(envUrl);
-      const isLocalConfiguredHost = configuredHost ? isLocalHost(configuredHost) : false;
-      const isLocalBrowserHost = isLocalHost(window.location.hostname);
+      const configuredHost = new URL(envUrl).hostname;
+      const isLocalConfiguredHost = configuredHost === 'localhost' || configuredHost === '127.0.0.1';
+      const isLocalBrowserHost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
       if (!isLocalConfiguredHost || isLocalBrowserHost) return envUrl;
     }
 
