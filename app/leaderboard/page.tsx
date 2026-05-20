@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 import { getPlayerId } from "../../src/client/identity";
 import type { AIDifficulty } from "../../src/game/state";
+import { GlassBeam, HUDFrame } from "../../components/fx/Animations";
 
 type Mode = "pvp" | "easy" | "normal" | "hard";
 type Metric = "best_score" | "wins";
@@ -142,7 +143,9 @@ function LeaderboardInner() {
           <div className="w-12" />
         </div>
 
-        <div className="glass rounded-2xl border border-white/10 p-4 sm:p-6 space-y-4 sm:space-y-6">
+        <div className="glass rounded-2xl border border-white/10 p-4 sm:p-6 space-y-4 sm:space-y-6 relative overflow-hidden">
+          <GlassBeam />
+          <HUDFrame />
           <div className="grid grid-cols-4 gap-2">
             {MODE_TABS.map((tab) => (
               <button

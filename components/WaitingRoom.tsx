@@ -3,6 +3,7 @@
 import { useGameStore } from "../src/client/store/gameStore";
 import { sendReady } from "../src/client/network/client";
 import { PLAYER_COLORS } from "../src/game/state";
+import { GlassBeam, HoverShimmer, HUDFrame } from "./fx/Animations";
 
 export const WaitingRoom = () => {
   const { players, roomId, myPlayerId, settings, isPrivateRoom } = useGameStore();
@@ -19,6 +20,8 @@ export const WaitingRoom = () => {
       <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-30 pointer-events-none mix-blend-screen" />
       <div className="relative min-h-full flex flex-col items-center justify-center p-4 sm:p-6">
         <div className="glass p-5 sm:p-10 md:p-12 rounded-2xl sm:rounded-3xl border border-white/10 shadow-[0_0_80px_rgba(0,0,0,1)] w-full max-w-3xl relative overflow-hidden">
+          <GlassBeam />
+          <HUDFrame />
 
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-6 sm:mb-12">
             <h2 className="text-3xl sm:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-white/50 tracking-tight shrink-0">
@@ -58,6 +61,11 @@ export const WaitingRoom = () => {
                     <div className="text-base sm:text-xl font-bold flex items-center space-x-2 sm:space-x-3 flex-wrap">
                       <span className="truncate">{p.name || `Player ${i + 1}`}</span>
                       {p.id === myPlayerId && <span className="text-[10px] sm:text-xs bg-white/10 px-2 py-0.5 sm:py-1 rounded text-white/70 tracking-widest uppercase">You</span>}
+                      {p.isAI && (
+                        <span className="text-[10px] sm:text-xs bg-amber-500/15 text-amber-200 px-2 py-0.5 sm:py-1 rounded tracking-widest uppercase font-bold">
+                          AI{p.aiDifficulty ? ` · ${p.aiDifficulty}` : ""}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -80,13 +88,14 @@ export const WaitingRoom = () => {
 
           <button
             onClick={handleReady}
-            className={`w-full py-4 sm:py-6 rounded-xl sm:rounded-2xl font-black text-lg sm:text-2xl tracking-widest uppercase transition-all duration-500 ${
+            className={`relative overflow-hidden w-full py-4 sm:py-6 rounded-xl sm:rounded-2xl font-black text-lg sm:text-2xl tracking-widest uppercase transition-all duration-500 ${
               isReady
                 ? "bg-emerald-600/20 border border-emerald-500/50 text-emerald-400 shadow-[0_0_50px_rgba(16,185,129,0.2)]"
                 : "bg-gradient-to-r from-cyan-600 to-fuchsia-600 hover:from-cyan-500 hover:to-fuchsia-500 text-white shadow-[0_0_40px_rgba(34,211,238,0.4)]"
             }`}
           >
-            {isReady ? "Status: Ready" : "Engage"}
+            <span className="relative z-10">{isReady ? "Status: Ready" : "Engage"}</span>
+            <HoverShimmer />
           </button>
         </div>
       </div>

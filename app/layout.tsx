@@ -6,6 +6,9 @@ import { AppChrome } from '../components/AppChrome';
 export const metadata = {
   title: 'Tricon',
   description: 'Triangle territory game in space',
+  icons: {
+    icon: [{ url: '/brand/favicon.svg', type: 'image/svg+xml' }],
+  },
 };
 
 export const viewport: Viewport = {

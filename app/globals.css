@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -6,11 +7,118 @@
   --color-space-700: #1a1a2e;
 }
 
+/* ============================================================
+   Tricon design tokens — colors, type, spacing, motion
+   Mirrors tricon-design-system/colors_and_type.css. Tokens are
+   referenced as var(--token); legacy Tailwind utilities still work.
+   ============================================================ */
 :root {
   --background: var(--color-space-900);
   --foreground: #ffffff;
+
+  /* Void scale */
+  --void-1000: #020208;
+  --void-900: #050510;
+  --void-800: #0a0a1a;
+  --void-700: #14142b;
+  --void-600: #1f1f3d;
+  --void-500: #2a2a52;
+
+  /* Glass + well */
+  --glass-fill: rgba(26, 26, 46, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.10);
+  --glass-border-strong: rgba(255, 255, 255, 0.20);
+  --glass-blur: 12px;
+  --well-fill: rgba(0, 0, 0, 0.30);
+  --well-fill-strong: rgba(0, 0, 0, 0.50);
+  --well-border: rgba(255, 255, 255, 0.06);
+
+  /* Foreground */
+  --fg-1: #ffffff;
+  --fg-2: rgba(255, 255, 255, 0.80);
+  --fg-3: rgba(255, 255, 255, 0.60);
+  --fg-4: rgba(255, 255, 255, 0.40);
+  --fg-5: rgba(255, 255, 255, 0.20);
+
+  /* Player palette (constellation) */
+  --player-1: #00FFFF;
+  --player-1-glow: rgba(0, 255, 255, 0.55);
+  --player-2: #FF3FE0;
+  --player-2-glow: rgba(255, 63, 224, 0.55);
+  --player-3: #FFD43A;
+  --player-3-glow: rgba(255, 212, 58, 0.55);
+  --player-4: #3DFFB3;
+  --player-4-glow: rgba(61, 255, 179, 0.55);
+
+  /* Semantic accents */
+  --accent-info-text: #A5F3FC;
+  --accent-info-base: #22D3EE;
+  --accent-info-glow: rgba(34, 211, 238, 0.30);
+  --accent-info-surface: rgba(34, 211, 238, 0.10);
+  --accent-info-surface-strong: rgba(34, 211, 238, 0.20);
+  --accent-info-border: rgba(34, 211, 238, 0.30);
+  --accent-info-border-strong: rgba(34, 211, 238, 0.60);
+
+  --accent-positive-text: #A7F3D0;
+  --accent-positive-base: #34D399;
+  --accent-positive-surface: rgba(16, 185, 129, 0.10);
+  --accent-positive-surface-strong: rgba(16, 185, 129, 0.20);
+  --accent-positive-border: rgba(16, 185, 129, 0.30);
+  --accent-positive-border-strong: rgba(52, 211, 153, 0.60);
+
+  --accent-warning-text: #FDE68A;
+  --accent-warning-base: #F59E0B;
+  --accent-warning-surface: rgba(245, 158, 11, 0.10);
+  --accent-warning-surface-strong: rgba(245, 158, 11, 0.20);
+  --accent-warning-border: rgba(245, 158, 11, 0.30);
+  --accent-warning-border-strong: rgba(245, 158, 11, 0.60);
+
+  --accent-danger-text: #FECDD3;
+  --accent-danger-base: #FB7185;
+  --accent-danger-surface: rgba(244, 63, 94, 0.10);
+  --accent-danger-surface-strong: rgba(244, 63, 94, 0.20);
+  --accent-danger-border: rgba(244, 63, 94, 0.30);
+  --accent-danger-border-strong: rgba(244, 63, 94, 0.60);
+
+  --accent-special-text: #F5D0FE;
+  --accent-special-base: #E879F9;
+  --accent-special-surface: rgba(232, 121, 249, 0.10);
+  --accent-special-surface-strong: rgba(232, 121, 249, 0.20);
+  --accent-special-border: rgba(232, 121, 249, 0.30);
+  --accent-special-border-strong: rgba(232, 121, 249, 0.60);
+
+  /* Signature gradients */
+  --gradient-tricon: linear-gradient(90deg, #00FFFF 0%, #3DFFB3 50%, #FF3FE0 100%);
+  --gradient-victory: linear-gradient(90deg, #6EE7B7 0%, #67E8F9 100%);
+  --gradient-defeat: linear-gradient(90deg, #F0ABFC 0%, #FDA4AF 100%);
+  --gradient-cta: linear-gradient(90deg, #0891B2 0%, #059669 100%);
+  --gradient-engage: linear-gradient(90deg, #0891B2 0%, #C026D3 100%);
+  --gradient-leaderboard: linear-gradient(90deg, #FCD34D 0%, #FB7185 100%);
+
+  /* Type */
+  --font-display: "Space Grotesk", "Pretendard", "Apple SD Gothic Neo",
+                  system-ui, -apple-system, sans-serif;
+  --font-body: "Space Grotesk", "Pretendard", "Apple SD Gothic Neo",
+               system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* Shadows + glows */
+  --shadow-panel: 0 10px 40px rgba(0, 0, 0, 0.5);
+  --shadow-panel-strong: 0 20px 60px rgba(0, 0, 0, 0.8);
+  --glow-cyan: 0 0 15px rgba(34, 211, 238, 0.30);
+  --glow-cyan-strong: 0 0 30px rgba(34, 211, 238, 0.50);
+  --glow-emerald: 0 0 15px rgba(52, 211, 153, 0.30);
+  --glow-emerald-strong: 0 0 30px rgba(52, 211, 153, 0.50);
+  --glow-fuchsia: 0 0 15px rgba(232, 121, 249, 0.30);
+  --glow-amber: 0 0 15px rgba(245, 158, 11, 0.30);
+  --glow-rose: 0 0 15px rgba(244, 63, 94, 0.30);
+  --glow-cta: 0 0 30px rgba(34, 211, 238, 0.40);
+  --glow-engage: 0 0 40px rgba(34, 211, 238, 0.40);
 }
 
+/* ============================================================
+   Global base
+   ============================================================ */
 html, body {
   margin: 0;
   padding: 0;
@@ -19,10 +127,15 @@ html, body {
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: var(--font-body);
+  font-feature-settings: "tnum" 1, "ss01" 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   overscroll-behavior-y: none;
   -webkit-text-size-adjust: 100%;
 }
+
+* { box-sizing: border-box; }
 
 /* Applied on the game page to lock the viewport during play. */
 body.game-lock {
@@ -35,22 +148,24 @@ body.game-lock {
 }
 
 .glass {
-  background: rgba(26, 26, 46, 0.6);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--glass-fill);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
 }
 
+/* ============================================================
+   Wordmark gradient — perpetual horizontal pan
+   ============================================================ */
 @keyframes gradient-shift {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+@keyframes tricon-gradient-shift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 .animated-gradient-text {
@@ -58,27 +173,187 @@ body.game-lock {
   animation: gradient-shift 6s ease-in-out infinite;
 }
 
-@keyframes page-enter {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.tricon-wordmark {
+  background: var(--gradient-tricon);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: tricon-gradient-shift 6s ease-in-out infinite;
 }
 
+/* ============================================================
+   Page-transition — gentle (legacy) and sharp (redesign)
+   ============================================================ */
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 .page-transition {
   animation: page-enter 220ms ease-out both;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .animated-gradient-text {
-    animation: none;
-  }
+@keyframes tk-page-enter-sharp {
+  0%   { opacity: 0; transform: translateY(24px) scale(0.985); filter: blur(6px); }
+  60%  { opacity: 1; filter: blur(0); }
+  100% { opacity: 1; transform: translateY(0)    scale(1);     filter: blur(0); }
+}
+.page-transition-sharp {
+  animation: tk-page-enter-sharp 600ms cubic-bezier(0.2, 0.9, 0.2, 1) both;
+}
 
-  .page-transition {
-    animation: none;
+/* ============================================================
+   FX — aurora, scanline, grid, HUD corners, shimmer, twinkle…
+   ============================================================ */
+
+/* Aurora drift */
+@keyframes tk-aurora-drift-a {
+  0%   { transform: translate(0%, 0%) scale(1); }
+  33%  { transform: translate(8%, -6%) scale(1.15); }
+  66%  { transform: translate(-4%, 10%) scale(0.95); }
+  100% { transform: translate(0%, 0%) scale(1); }
+}
+@keyframes tk-aurora-drift-b {
+  0%   { transform: translate(0%, 0%) scale(1); }
+  50%  { transform: translate(-10%, 8%) scale(1.2); }
+  100% { transform: translate(0%, 0%) scale(1); }
+}
+
+.fx-aurora { animation-fill-mode: both; animation-iteration-count: infinite; animation-timing-function: ease-in-out; }
+.fx-aurora-a { animation: tk-aurora-drift-a 22s infinite ease-in-out; }
+.fx-aurora-b { animation: tk-aurora-drift-b 28s infinite ease-in-out; }
+
+/* Scanline — slow vertical light sweep */
+@keyframes tk-scanline {
+  0%   { transform: translateY(-100%); opacity: 0; }
+  6%   { opacity: 0.6; }
+  94%  { opacity: 0.6; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+.fx-scanline-host {
+  position: fixed; inset: 0; pointer-events: none; z-index: 1; overflow: hidden;
+}
+.fx-scanline {
+  position: absolute; left: 0; right: 0; height: 90vh; top: 0;
+  background: linear-gradient(180deg,
+    transparent 0%,
+    rgba(34, 211, 238, 0.0) 60%,
+    rgba(34, 211, 238, 0.18) 88%,
+    rgba(167, 243, 208, 0.30) 95%,
+    rgba(232, 121, 249, 0.0) 100%);
+  animation: tk-scanline 9s linear infinite;
+  mix-blend-mode: screen;
+  filter: blur(2px);
+}
+
+/* Faint sci-fi grid */
+.fx-grid-overlay {
+  position: fixed; inset: 0; pointer-events: none; z-index: 1;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse at center, rgba(0,0,0,0.6) 30%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse at center, rgba(0,0,0,0.6) 30%, transparent 80%);
+}
+
+/* HUD corner reveal */
+@keyframes tk-corner-in {
+  from { opacity: 0; transform: scale(0.6); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* Glass top-edge beam — traveling light */
+@keyframes tk-glass-beam {
+  0%   { background-position: -100% 0; }
+  100% { background-position:  200% 0; }
+}
+
+/* Pulse glow */
+@keyframes tk-pulse-glow {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50%      { opacity: 1;   transform: scale(1.04); }
+}
+.fx-pulse { animation: tk-pulse-glow 2.4s ease-in-out infinite; }
+
+/* Star twinkle */
+@keyframes tk-twinkle {
+  0%, 100% { opacity: 0.65; transform: scale(1); }
+  50%      { opacity: 1;    transform: scale(1.2); }
+}
+
+/* Triangle pop-in */
+@keyframes tk-tri-pop {
+  0%   { opacity: 0; transform: scale(0.4); }
+  60%  { opacity: 1; transform: scale(1.08); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.fx-tri-pop { animation: tk-tri-pop 600ms cubic-bezier(0.2, 1.4, 0.4, 1) both; }
+
+/* Logomark slow rotation around centroid */
+@keyframes tk-mark-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.fx-mark-spin { animation: tk-mark-spin 60s linear infinite; transform-origin: center; }
+
+/* Letter-by-letter reveal */
+@keyframes tk-letter-in {
+  from { opacity: 0; transform: translateY(20px) scale(0.92); filter: blur(8px); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    filter: blur(0); }
+}
+.letter-stagger > .ltr {
+  display: inline-block;
+  opacity: 0;
+  animation: tk-letter-in 700ms cubic-bezier(0.2, 0.9, 0.2, 1) both;
+}
+
+/* Pulse ring — for active player */
+@keyframes tk-pulse-ring {
+  0%   { transform: scale(0.6); opacity: 0.9; }
+  100% { transform: scale(1.8); opacity: 0;   }
+}
+
+/* Button shimmer — soft diagonal light pass on hover */
+@keyframes tk-shimmer {
+  0%   { transform: translateX(-140%) skewX(-18deg); opacity: 0; }
+  20%  { opacity: 1; }
+  80%  { opacity: 1; }
+  100% { transform: translateX(180%)  skewX(-18deg); opacity: 0; }
+}
+.btn-shimmer {
+  position: absolute; inset: 0; overflow: hidden; pointer-events: none; border-radius: inherit;
+}
+.btn-shimmer::after {
+  content: ""; position: absolute; top: -20%; bottom: -20%; width: 70%;
+  background: linear-gradient(90deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.05) 30%,
+    rgba(255,255,255,0.18) 50%,
+    rgba(255,255,255,0.05) 70%,
+    rgba(255,255,255,0) 100%);
+  transform: translateX(-140%) skewX(-18deg);
+  filter: blur(2px);
+  mix-blend-mode: screen;
+  opacity: 0;
+}
+.btn-shimmer.run::after {
+  animation: tk-shimmer 1500ms cubic-bezier(0.4, 0.0, 0.2, 1);
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animated-gradient-text,
+  .tricon-wordmark,
+  .page-transition,
+  .page-transition-sharp,
+  .fx-aurora-a, .fx-aurora-b,
+  .fx-scanline,
+  .fx-pulse,
+  .fx-tri-pop,
+  .fx-mark-spin,
+  .letter-stagger > .ltr {
+    animation: none !important;
   }
+  .letter-stagger > .ltr { opacity: 1; }
 }

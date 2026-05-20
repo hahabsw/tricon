@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createRoom, leaveRoom } from "../src/client/network/client";
 import { AIDifficulty, GameSettings } from "../src/game/state";
+import { GlassBeam, HoverShimmer, HUDFrame } from "./fx/Animations";
 
 export const Lobby = () => {
   const router = useRouter();
@@ -39,6 +40,8 @@ export const Lobby = () => {
 
   return (
     <div className="glass p-6 sm:p-10 md:p-12 rounded-2xl sm:rounded-3xl w-full max-w-2xl border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.8)] relative overflow-hidden">
+      <GlassBeam />
+      <HUDFrame />
       <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 rounded-full blur-[80px] pointer-events-none" />
 
       <h1 className="text-3xl sm:text-4xl font-bold mb-6 sm:mb-8 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-emerald-400">
@@ -191,9 +194,10 @@ export const Lobby = () => {
         <button
           onClick={handleCreate}
           disabled={loading}
-          className="flex-1 py-3 sm:py-4 bg-gradient-to-r from-cyan-600 to-emerald-600 hover:from-cyan-500 hover:to-emerald-500 rounded-lg sm:rounded-xl font-bold shadow-[0_0_30px_rgba(34,211,238,0.4)] transition-all text-sm sm:text-base"
+          className="relative overflow-hidden flex-1 py-3 sm:py-4 bg-gradient-to-r from-cyan-600 to-emerald-600 hover:from-cyan-500 hover:to-emerald-500 rounded-lg sm:rounded-xl font-bold shadow-[0_0_30px_rgba(34,211,238,0.4)] transition-all text-sm sm:text-base"
         >
-          {loading ? "Creating..." : "Launch Room"}
+          <span className="relative z-10">{loading ? "Creating..." : "Launch Room"}</span>
+          <HoverShimmer />
         </button>
       </div>
     </div>

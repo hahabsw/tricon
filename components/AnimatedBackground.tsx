@@ -11,6 +11,7 @@ interface BgStar {
   r: number;
   phase: number;
   speed: number;
+  depth: number;
 }
 
 interface BgEdge {
@@ -18,6 +19,7 @@ interface BgEdge {
   b: number;
   born: number;
   durMs: number;
+  colorIdx: number;
 }
 
 interface BgTriangle {
@@ -36,9 +38,28 @@ function hexToRgb(hex: string): [number, number, number] {
   ];
 }
 
-export const AnimatedBackground = () => {
+export const AnimatedBackground = ({
+  intensity = 1,
+  parallax = true,
+}: {
+  intensity?: number;
+  parallax?: boolean;
+}) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rafRef = useRef<number>(0);
+  const mouseRef = useRef({ x: 0, y: 0, tx: 0, ty: 0 });
+
+  useEffect(() => {
+    if (!parallax) return;
+    const onMove = (e: PointerEvent) => {
+      const x = (e.clientX / window.innerWidth - 0.5) * 2;
+      const y = (e.clientY / window.innerHeight - 0.5) * 2;
+      mouseRef.current.tx = x;
+      mouseRef.current.ty = y;
+    };
+    window.addEventListener("pointermove", onMove);
+    return () => window.removeEventListener("pointermove", onMove);
+  }, [parallax]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -63,15 +84,16 @@ export const AnimatedBackground = () => {
     };
     resize();
 
-    const starCount = Math.min(90, Math.max(25, Math.floor((w * h) / 18000)));
+    const starCount = Math.min(180, Math.max(40, Math.floor(((w * h) / 12000) * intensity)));
     const stars: BgStar[] = Array.from({ length: starCount }, () => ({
       x: Math.random() * w,
       y: Math.random() * h,
-      vx: (Math.random() - 0.5) * 0.04,
-      vy: (Math.random() - 0.5) * 0.04,
-      r: Math.random() * 1.2 + 0.5,
+      vx: (Math.random() - 0.5) * 0.06,
+      vy: (Math.random() - 0.5) * 0.06,
+      r: Math.random() * 1.4 + 0.4,
       phase: Math.random() * Math.PI * 2,
-      speed: Math.random() * 0.002 + 0.0008,
+      speed: Math.random() * 0.003 + 0.001,
+      depth: Math.random() * 0.7 + 0.3,
     }));
 
     const edges: BgEdge[] = [];
@@ -87,7 +109,7 @@ export const AnimatedBackground = () => {
       maxDist: number,
       n: number
     ): number[] | null => {
-      for (let tries = 0; tries < 20; tries++) {
+      for (let tries = 0; tries < 24; tries++) {
         const seedIdx = Math.floor(Math.random() * stars.length);
         const seed = stars[seedIdx];
         const cluster: number[] = [seedIdx];
@@ -112,8 +134,13 @@ export const AnimatedBackground = () => {
 
     const loop = (now: number) => {
       rafRef.current = requestAnimationFrame(loop);
-
       const elapsed = now - start;
+
+      mouseRef.current.x += (mouseRef.current.tx - mouseRef.current.x) * 0.06;
+      mouseRef.current.y += (mouseRef.current.ty - mouseRef.current.y) * 0.06;
+      const mx = mouseRef.current.x;
+      const my = mouseRef.current.y;
+
       ctx.clearRect(0, 0, w, h);
 
       for (const s of stars) {
@@ -130,31 +157,41 @@ export const AnimatedBackground = () => {
           ? 0.7
           : 0.35 + 0.5 * (0.5 + 0.5 * Math.sin(s.phase + elapsed * s.speed));
         const r = s.r;
+        const ox = mx * 14 * s.depth;
+        const oy = my * 14 * s.depth;
+        const x = s.x + ox;
+        const y = s.y + oy;
 
-        const glow = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, r * 7);
-        glow.addColorStop(0, `rgba(200, 230, 255, ${twinkle * 0.65})`);
-        glow.addColorStop(0.35, `rgba(120, 180, 255, ${twinkle * 0.12})`);
+        const glow = ctx.createRadialGradient(x, y, 0, x, y, r * 7);
+        glow.addColorStop(0, `rgba(200, 230, 255, ${twinkle * 0.7})`);
+        glow.addColorStop(0.35, `rgba(120, 180, 255, ${twinkle * 0.14})`);
         glow.addColorStop(1, "rgba(0, 0, 0, 0)");
         ctx.fillStyle = glow;
-        ctx.fillRect(s.x - r * 7, s.y - r * 7, r * 14, r * 14);
+        ctx.fillRect(x - r * 7, y - r * 7, r * 14, r * 14);
 
         ctx.beginPath();
-        ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
+        ctx.arc(x, y, r, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(255, 255, 255, ${twinkle})`;
         ctx.fill();
       }
 
-      if (!reducedMotion && now - lastEdgeSpawn > 1400 + Math.random() * 1800) {
+      if (!reducedMotion && now - lastEdgeSpawn > 900 + Math.random() * 1200) {
         lastEdgeSpawn = now;
-        const cluster = findCluster(60, 220, 2);
+        const cluster = findCluster(60, 260, 2);
         if (cluster) {
-          edges.push({ a: cluster[0], b: cluster[1], born: now, durMs: 3500 });
+          edges.push({
+            a: cluster[0],
+            b: cluster[1],
+            born: now,
+            durMs: 3500,
+            colorIdx: Math.floor(Math.random() * colors.length),
+          });
         }
       }
 
-      if (!reducedMotion && now - lastTriSpawn > 7000 + Math.random() * 5000) {
+      if (!reducedMotion && now - lastTriSpawn > 4500 + Math.random() * 3500) {
         lastTriSpawn = now;
-        const cluster = findCluster(70, 240, 3);
+        const cluster = findCluster(70, 280, 3);
         if (cluster) {
           triangles.push({
             stars: [cluster[0], cluster[1], cluster[2]],
@@ -173,20 +210,19 @@ export const AnimatedBackground = () => {
           continue;
         }
         const p = age / e.durMs;
-        const alpha = Math.sin(p * Math.PI) * 0.4;
+        const alpha = Math.sin(p * Math.PI) * 0.55;
         const sa = stars[e.a];
         const sb = stars[e.b];
         const drawProgress = Math.min(1, p * 3);
-        const endX = sa.x + (sb.x - sa.x) * drawProgress;
-        const endY = sa.y + (sb.y - sa.y) * drawProgress;
+        const [r, g, b] = colors[e.colorIdx];
         ctx.save();
-        ctx.strokeStyle = `rgba(130, 220, 255, ${alpha})`;
-        ctx.lineWidth = 1;
-        ctx.shadowColor = "rgba(100, 220, 255, 0.6)";
-        ctx.shadowBlur = 8;
+        ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        ctx.lineWidth = 1.2;
+        ctx.shadowColor = `rgba(${r}, ${g}, ${b}, 0.7)`;
+        ctx.shadowBlur = 12;
         ctx.beginPath();
         ctx.moveTo(sa.x, sa.y);
-        ctx.lineTo(endX, endY);
+        ctx.lineTo(sa.x + (sb.x - sa.x) * drawProgress, sa.y + (sb.y - sa.y) * drawProgress);
         ctx.stroke();
         ctx.restore();
       }
@@ -199,7 +235,7 @@ export const AnimatedBackground = () => {
           continue;
         }
         const p = age / tri.durMs;
-        const alpha = Math.sin(p * Math.PI) * 0.35;
+        const alpha = Math.sin(p * Math.PI) * 0.45;
         const [s1, s2, s3] = [
           stars[tri.stars[0]],
           stars[tri.stars[1]],
@@ -213,12 +249,12 @@ export const AnimatedBackground = () => {
         ctx.lineTo(s2.x, s2.y);
         ctx.lineTo(s3.x, s3.y);
         ctx.closePath();
-        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha * 0.14})`;
+        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha * 0.16})`;
         ctx.fill();
         ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
-        ctx.lineWidth = 1;
-        ctx.shadowColor = `rgba(${r}, ${g}, ${b}, 0.8)`;
-        ctx.shadowBlur = 10;
+        ctx.lineWidth = 1.2;
+        ctx.shadowColor = `rgba(${r}, ${g}, ${b}, 0.9)`;
+        ctx.shadowBlur = 14;
         ctx.stroke();
         ctx.restore();
       }
@@ -240,7 +276,7 @@ export const AnimatedBackground = () => {
       window.removeEventListener("resize", onResize);
       document.removeEventListener("visibilitychange", onVisibilityChange);
     };
-  }, []);
+  }, [intensity]);
 
   return (
     <canvas
