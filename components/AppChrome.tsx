@@ -90,15 +90,14 @@ function ScanLine() {
 
 export function AppChrome({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const isGame = pathname?.startsWith("/game/");
 
   return (
     <>
       <div className="fixed inset-0 z-0 overflow-hidden bg-space-900">
-        <AnimatedBackground parallax={!isGame} />
+        <AnimatedBackground />
         <Aurora />
         <GridOverlay />
-        {!isGame && <ScanLine />}
+        <ScanLine />
       </div>
       <main className="relative z-10 min-h-dvh">
         <div key={pathname} className="page-transition-sharp min-h-dvh">

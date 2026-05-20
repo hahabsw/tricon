@@ -496,9 +496,9 @@ export const GameBoard = () => {
   return (
     <div
       ref={containerRef}
-      className="w-full h-full relative border border-white/10 rounded-xl overflow-hidden shadow-[0_0_20px_rgba(0,0,0,0.5)] bg-space-900 touch-none [&>canvas]:block [&>canvas]:w-full [&>canvas]:h-full"
+      className="w-full h-full relative border border-white/10 rounded-xl overflow-hidden shadow-[0_0_20px_rgba(0,0,0,0.5)] bg-black/30 backdrop-blur-sm touch-none [&>canvas]:block [&>canvas]:w-full [&>canvas]:h-full"
     >
-      <Application background="#050510" resizeTo={containerRef} antialias>
+      <Application backgroundAlpha={0} resizeTo={containerRef} antialias>
         <BoardRenderer />
       </Application>
     </div>
